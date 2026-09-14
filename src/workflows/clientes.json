@@ -1,0 +1,790 @@
+{
+  "name": "clientes",
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "b63f514a-de84-4e68-9192-92f969757b6c",
+      "name": "retorna cliente registrado"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  erro: \"Dados inválidos\",\n  detalhes: $json.erros\n} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        96
+      ],
+      "id": "0f6c6ca0-bbe2-41d6-864d-40d51d92948a",
+      "name": "retorna erros"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "clientes",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d4d29a55-ab51-40e8-9967-7bcbc60f80fe",
+      "name": "cadastrar cliente",
+      "webhookId": "d864f352-2294-4ec9-90f6-18c01e5b5add"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        368
+      ],
+      "id": "58555727-60dd-465d-8aea-0a7d77c1a564",
+      "name": "cliente encontrado?"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        288
+      ],
+      "id": "2fc7967c-52cd-4c20-8a6c-03caaad96adf",
+      "name": "retorna dados do cliente"
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { id, valido: isUuid }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        448
+      ],
+      "id": "97569c49-ea37-4e0c-bdab-df3f92a9912b",
+      "name": "validação UUID"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { nome, email, telefone } = $input.first().json.body;\n\nconst erros = [];\n\nif (!nome || nome.trim().length < 2) erros.push(\"nome é obrigatório\");\nif (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) erros.push(\"email inválido\");\nif (!telefone || telefone.trim().length < 8) erros.push(\"telefone é obrigatório\");\nelse if (!/^\\([1-9]{2}\\) (?:[2-8]|9[0-9])[0-9]{3}\\-[0-9]{4}$/.test(telefone)) erros.push(\"telefone inválido\")\n\nreturn [{ json: { nome, email, telefone, erros, valido: erros.length === 0 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "38a47c54-5c77-490e-a177-9950b37c183d",
+      "name": "validação campos"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"UUID inválido\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        544
+      ],
+      "id": "8bbe4366-c434-4a9a-b5d9-c16eeb532f70",
+      "name": "retorna erro de UUID"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Cliente não encontrado\"\n}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        464
+      ],
+      "id": "02d87172-41a3-4451-94f7-4e2107169269",
+      "name": "retorna mensagem 404"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        448
+      ],
+      "id": "d4241163-205d-4d90-a36a-9097ab6116e7",
+      "name": "UUID válido?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "6ea31a94-3a22-487e-835a-52527e114f79",
+      "name": "campos validados?"
+    },
+    {
+      "parameters": {
+        "httpMethod": "DELETE",
+        "path": "clientes/:id",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        928
+      ],
+      "id": "671554d1-a7e4-4e0f-8cbb-d97b67ff2412",
+      "name": "remover cliente",
+      "webhookId": "9c3159f4-0551-4fc3-8b36-ff9495a70a82"
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { id, valido: isUuid }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        928
+      ],
+      "id": "a3cde5cb-ad21-46ed-9118-c48c3829a347",
+      "name": "validação UUID 1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        928
+      ],
+      "id": "c68bbb28-a592-430b-9415-12919c3f6ac1",
+      "name": "UUID válido? 1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from clientes where id = $1",
+        "options": {
+          "queryReplacement": "={{  $json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        672,
+        368
+      ],
+      "id": "5132b630-31c3-4eec-a05c-8bc32e245fbe",
+      "name": "busca cliente",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"UUID inválido\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        1024
+      ],
+      "id": "aeb19833-7e87-4e84-a2e3-30c6eb99ef91",
+      "name": "retorna erro de UUID 1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        1120,
+        752
+      ],
+      "id": "6e83f58d-0731-40eb-a1ed-5925b090c579",
+      "name": "remove cliente",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Cliente não encontrado\"\n}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        944
+      ],
+      "id": "0a6b4467-3604-4353-99c1-db5ef17d8af6",
+      "name": "retorna mensagem "
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 204
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1376,
+        752
+      ],
+      "id": "d8c09b17-67cd-4e19-b671-cf528a303aad",
+      "name": "retorna No Content"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        848
+      ],
+      "id": "55f0b375-21f7-4e49-a3f9-462819d115ba",
+      "name": "cliente encontrado? 1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from clientes where id = $1",
+        "options": {
+          "queryReplacement": "={{  $json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        672,
+        848
+      ],
+      "id": "97f963c1-8565-444a-b580-743c70bb4006",
+      "name": "busca cliente 1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome": "={{ $json.nome }}",
+            "email": "={{ $json.email }}",
+            "telefone": "={{ $json.telefone }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "79693d72-d083-49a3-946c-0ee77dde3489",
+      "name": "persiste cliente",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "clientes/:id",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        448
+      ],
+      "id": "8188d1d8-f24b-433a-b375-cb99224d164e",
+      "name": "consultar cliente",
+      "webhookId": "9c3159f4-0551-4fc3-8b36-ff9495a70a82"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "cadastrar cliente": {
+      "main": [
+        [
+          {
+            "node": "validação campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cliente encontrado?": {
+      "main": [
+        [
+          {
+            "node": "retorna dados do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna mensagem 404",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação UUID": {
+      "main": [
+        [
+          {
+            "node": "UUID válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação campos": {
+      "main": [
+        [
+          {
+            "node": "campos validados?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UUID válido?": {
+      "main": [
+        [
+          {
+            "node": "busca cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro de UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "campos validados?": {
+      "main": [
+        [
+          {
+            "node": "persiste cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remover cliente": {
+      "main": [
+        [
+          {
+            "node": "validação UUID 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação UUID 1": {
+      "main": [
+        [
+          {
+            "node": "UUID válido? 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UUID válido? 1": {
+      "main": [
+        [
+          {
+            "node": "busca cliente 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro de UUID 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca cliente": {
+      "main": [
+        [
+          {
+            "node": "cliente encontrado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remove cliente": {
+      "main": [
+        [
+          {
+            "node": "retorna No Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cliente encontrado? 1": {
+      "main": [
+        [
+          {
+            "node": "remove cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna mensagem ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca cliente 1": {
+      "main": [
+        [
+          {
+            "node": "cliente encontrado? 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "persiste cliente": {
+      "main": [
+        [
+          {
+            "node": "retorna cliente registrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar cliente": {
+      "main": [
+        [
+          {
+            "node": "validação UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "27bbaec7-44e9-474f-9ac2-a659d7b6970e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"
+  },
+  "nodeGroups": [],
+  "id": "Uime7dtKMxfa7j19",
+  "tags": []
+}
