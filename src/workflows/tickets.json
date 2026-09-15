@@ -33,7 +33,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body = $input.first().json.body ?? {};\n\nconst { cliente_id, titulo, descricao } = body;\n\nconst erros = [];\n\nconst isUuid = (value) =>\n    typeof value === 'string' &&\n    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(value);\n\nif (!cliente_id) {\n    erros.push('cliente_id é obrigatório');\n} else if (!isUuid(cliente_id)) {\n    erros.push('cliente_id inválido');\n}\n\nif (!titulo) {\n    erros.push('título é obrigatório');\n} else if (typeof titulo !== 'string' || titulo.trim().length < 2) {\n    erros.push('título inválido');\n}\n\nif (!descricao) {\n    erros.push('descrição é obrigatória');\n} else if (typeof descricao !== 'string' || descricao.trim().length < 8) {\n    erros.push('descrição deve ter pelo menos 8 caracteres');\n}\n\nreturn [{\n    json: {\n        cliente_id,\n        titulo: titulo,\n        descricao: descricao,\n        erros,\n        valido: erros.length === 0\n    }\n}];"
+        "jsCode": "const body = $input.first().json.body ?? {};\n\nconst { cliente_id, titulo, descricao, prioridade } = body;\n\nconst erros = [];\n\nconst PRIORIDADES_PERMITIDAS = [\"baixa\", \"media\", \"alta\"]\n\nconst isUuid = (value) =>\n    typeof value === 'string' &&\n    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(value);\n\nif (!cliente_id) {\n    erros.push('cliente_id é obrigatório');\n} else if (!isUuid(cliente_id)) {\n    erros.push('cliente_id inválido');\n}\n\nif (!titulo) {\n    erros.push('título é obrigatório');\n} else if (typeof titulo !== 'string' || titulo.trim().length < 2) {\n    erros.push('título inválido');\n}\n\nif (!descricao) {\n    erros.push('descrição é obrigatória');\n} else if (typeof descricao !== 'string' || descricao.trim().length < 8) {\n    erros.push('descrição deve ter pelo menos 8 caracteres');\n}\n\nif (prioridade && !PRIORIDADES_PERMITIDAS.includes(prioridade)) {\n  erros.push(\"prioridade inválida\")\n}\n\nreturn [{\n    json: {\n        cliente_id,\n        titulo,\n        descricao,\n        prioridade: prioridade ?? \"media\",\n        erros,\n        valido: erros.length === 0\n    }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -48,7 +48,9 @@
       "parameters": {
         "respondWith": "json",
         "responseBody": "{\n  \"erro\": \"UUID inválido\"\n}",
-        "options": {}
+        "options": {
+          "responseCode": 400
+        }
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
@@ -178,7 +180,9 @@
       "parameters": {
         "respondWith": "json",
         "responseBody": "{\n  \"erro\": \"UUID inválido\"\n}",
-        "options": {}
+        "options": {
+          "responseCode": 400
+        }
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
@@ -201,7 +205,7 @@
       "typeVersion": 1.5,
       "position": [
         1120,
-        2016
+        1936
       ],
       "id": "8dea3bf1-ff80-4065-88a2-a25456e22f39",
       "name": "retorna mensagem "
@@ -217,7 +221,7 @@
       "typeVersion": 1.5,
       "position": [
         1344,
-        1824
+        1664
       ],
       "id": "16b5e04d-dca3-438b-a3e7-fe73730d2462",
       "name": "retorna No Content"
@@ -251,7 +255,7 @@
       "typeVersion": 1.5,
       "position": [
         1344,
-        -64
+        -256
       ],
       "id": "dc7c34de-87ba-4b17-8e79-20c022f8af6c",
       "name": "retorna ticket registrado"
@@ -268,7 +272,7 @@
       "typeVersion": 1.5,
       "position": [
         1120,
-        32
+        -48
       ],
       "id": "9d031a4e-c3cd-4570-b03a-fcd23f5d5b26",
       "name": "retorna não encontrado"
@@ -276,16 +280,16 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO tickets (\n    protocolo,\n    cliente_id,\n    titulo,\n    descricao\n)\nVALUES (\n    'TK-' || extract(year from now()) || '-' ||\n    lpad(nextval('tickets_protocolo_seq')::text, 6, '0'),\n    $1,\n    $2,\n    $3\n)\nRETURNING *;",
+        "query": "INSERT INTO tickets (\n    protocolo,\n    cliente_id,\n    titulo,\n    descricao,\n    prioridade\n)\nVALUES (\n    'TK-' || extract(year from now()) || '-' ||\n    lpad(nextval('tickets_protocolo_seq')::text, 6, '0'),\n    $1,\n    $2,\n    $3,\n    $4\n)\nRETURNING *;",
         "options": {
-          "queryReplacement": "={{ $('campos validados?').item.json.cliente_id }},{{ $('campos validados?').item.json.titulo }},{{ $('campos validados?').item.json.descricao }}"
+          "queryReplacement": "={{ $('campos validados?').item.json.cliente_id }},{{ $('campos validados?').item.json.titulo }},{{ $('campos validados?').item.json.descricao }},{{ $('campos validados?').item.json.prioridade }}"
         }
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.7,
       "position": [
         1120,
-        -160
+        -240
       ],
       "id": "c9a7d120-1e5d-442d-8cc1-4100b79bf288",
       "name": "persiste ticket",
@@ -294,7 +298,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -325,7 +330,7 @@
       "typeVersion": 2.3,
       "position": [
         896,
-        864
+        784
       ],
       "id": "993ab0de-d9a4-4fb9-82a0-473e09e4baab",
       "name": "ticket encontrado?"
@@ -340,7 +345,7 @@
       "typeVersion": 1.5,
       "position": [
         1120,
-        768
+        688
       ],
       "id": "abc35707-e37b-4275-844a-dd6cdc9129ac",
       "name": "retorna dados do ticket"
@@ -357,7 +362,7 @@
       "typeVersion": 1.5,
       "position": [
         1120,
-        960
+        880
       ],
       "id": "a84d1ca3-d25c-4bbe-ba3f-b290b63de6ba",
       "name": "retorna não encontrado 1"
@@ -391,7 +396,7 @@
       "typeVersion": 2.3,
       "position": [
         896,
-        -64
+        -144
       ],
       "id": "ba813836-307c-4c48-8218-2e183c6ead7a",
       "name": "cliente encontrado?"
@@ -418,7 +423,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -493,13 +499,16 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
         "respondWith": "json",
         "responseBody": "={{ {\n  \"erro\": $json.erros\n}\n}}",
-        "options": {}
+        "options": {
+          "responseCode": 400
+        }
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
@@ -512,6 +521,7 @@
     },
     {
       "parameters": {
+        "respondWith": "allIncomingItems",
         "options": {
           "responseCode": 200
         }
@@ -520,7 +530,7 @@
       "typeVersion": 1.5,
       "position": [
         896,
-        400
+        320
       ],
       "id": "4d24dcc4-fbbf-4228-8dd2-d928d070bd2b",
       "name": "retorna tickets"
@@ -593,7 +603,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -606,8 +617,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1120,
-        2608
+        672,
+        2704
       ],
       "id": "892f683d-55e7-4704-b5e0-54f33484d20b",
       "name": "retorna erros2"
@@ -623,8 +634,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1568,
-        2512
+        1120,
+        2544
       ],
       "id": "34019561-be68-4995-98a9-df1cda8c30f1",
       "name": "retorna não encontrado1"
@@ -645,19 +656,6 @@
       "id": "dbdb9227-75e2-44b4-845f-be8edfc6bc86",
       "name": "registrar interação",
       "webhookId": "5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d"
-    },
-    {
-      "parameters": {
-        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { id, valido: isUuid }"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        224,
-        2608
-      ],
-      "id": "5d6f25a9-a5b2-4cf3-9955-bf84d9db3068",
-      "name": "validação UUID "
     },
     {
       "parameters": {
@@ -690,68 +688,6 @@
         448,
         2608
       ],
-      "id": "88bb3dcf-7ecd-478f-8cf9-f109b85407f2",
-      "name": "UUID válido? "
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\n  \"erro\": \"ID de Ticket inválido\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        672,
-        2704
-      ],
-      "id": "fdcb829d-db24-4c97-a695-8f33d44fcc5a",
-      "name": "retorna erro de UUID1"
-    },
-    {
-      "parameters": {
-        "jsCode": "const mensagem = $(\"registrar interação\").first().json.body.mensagem ?? null;\n\nconst erros = [];\n\nif (!mensagem) {\n    erros.push('mensagem é obrigatória');\n} else if (typeof mensagem !== 'string' || mensagem.trim().length < 5) {\n    erros.push('mensagem inválida');\n}\n\nreturn [{\n    json: {\n        mensagem,\n        erros,\n        valido: erros.length === 0\n    }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        672,
-        2512
-      ],
-      "id": "f96296bb-f85b-4152-af38-0a033c17d0fa",
-      "name": "validação mensagem"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
-              "leftValue": "={{ $json.valido }}",
-              "rightValue": "",
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        896,
-        2512
-      ],
       "id": "54ca6be5-0c70-4a15-8060-2e2fb2942881",
       "name": "mensagem validada?"
     },
@@ -760,14 +696,14 @@
         "operation": "executeQuery",
         "query": "select id from tickets where id = $1",
         "options": {
-          "queryReplacement": "={{  $('validação UUID ').first().json.id }}"
+          "queryReplacement": "={{  $('validação mensagem + id').first().json.id }}"
         }
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.7,
       "position": [
-        1120,
-        2416
+        672,
+        2512
       ],
       "id": "e4e8d679-1ded-44ac-9380-21e131d47ac2",
       "name": "busca ticket",
@@ -777,7 +713,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -807,8 +744,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1344,
-        2416
+        896,
+        2448
       ],
       "id": "198d1a1d-dd08-4267-bc1b-03fa8ee70331",
       "name": "ticket encontrado?1"
@@ -829,9 +766,9 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "ticket_id": "={{ $('validação UUID ').first().json.id }}",
+            "ticket_id": "={{ $json.id }}",
             "tipo": "comentario",
-            "mensagem": "={{ $('validação mensagem').first().json.mensagem }}"
+            "mensagem": "={{ $('validação mensagem + id').first().json.mensagem }}"
           },
           "matchingColumns": [
             "id"
@@ -893,8 +830,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.7,
       "position": [
-        1568,
-        2320
+        1120,
+        2352
       ],
       "id": "fb1c8333-7f1b-432f-adb2-fbac86614852",
       "name": "persiste interação",
@@ -904,7 +841,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -917,8 +855,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1792,
-        2320
+        1344,
+        2272
       ],
       "id": "b89c9469-b896-4d5e-893d-db026d6d78e7",
       "name": "retorna interação registrada"
@@ -945,7 +883,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -976,7 +915,7 @@
       "typeVersion": 2.3,
       "position": [
         896,
-        1920
+        1840
       ],
       "id": "91aa2e20-ed86-4053-81e9-af09f5fd9b14",
       "name": "ticket encontrado?2"
@@ -1010,7 +949,7 @@
       "typeVersion": 2.7,
       "position": [
         1120,
-        1824
+        1744
       ],
       "id": "6993368d-7e21-4ff5-9460-2a42f1b20a8f",
       "name": "remove ticket",
@@ -1020,7 +959,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1051,7 +991,7 @@
       "typeVersion": 2.3,
       "position": [
         896,
-        1408
+        1344
       ],
       "id": "1bc01831-a58a-46ea-821a-6381e8bb9699",
       "name": "ticket encontrado?3"
@@ -1066,7 +1006,7 @@
       "typeVersion": 1.5,
       "position": [
         1344,
-        1408
+        1232
       ],
       "id": "94243093-ca76-412f-9648-8f4596b00fe7",
       "name": "retorna dados do ticket1"
@@ -1083,7 +1023,7 @@
       "typeVersion": 1.5,
       "position": [
         1120,
-        1504
+        1440
       ],
       "id": "285cdcb7-8b23-4338-a8f7-a561076eb613",
       "name": "retorna não encontrado "
@@ -1143,7 +1083,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1196,7 +1137,9 @@
       "parameters": {
         "respondWith": "json",
         "responseBody": "={{ {\n  \"erros\": $json.erros\n  }\n}}",
-        "options": {}
+        "options": {
+          "responseCode": 400
+        }
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
@@ -1332,7 +1275,7 @@
       "typeVersion": 2.7,
       "position": [
         1120,
-        1312
+        1248
       ],
       "id": "1b6d25cd-9e3a-4cc2-9985-0dfef4b7b9ea",
       "name": "atualiza status e atualizado_em",
@@ -1341,7 +1284,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1424,7 +1368,7 @@
       "typeVersion": 2.7,
       "position": [
         1344,
-        1216
+        1056
       ],
       "id": "1b820721-3ec1-4e49-9b82-661c6cc4f452",
       "name": "cria interação de atualização de status",
@@ -1462,10 +1406,11 @@
       "typeVersion": 4.5,
       "position": [
         1344,
-        -256
+        -416
       ],
       "id": "3f712912-4efc-4368-bdfc-e5d30bc7d9b0",
-      "name": "HTTP externo"
+      "name": "HTTP externo",
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1494,10 +1439,194 @@
       "typeVersion": 4.5,
       "position": [
         1568,
-        1216
+        1056
       ],
       "id": "d704c2f0-cc6c-4ebf-8096-115e2947e1e5",
-      "name": "HTTP externo1"
+      "name": "HTTP externo1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        32
+      ],
+      "id": "c832b341-a475-4fe5-8bcd-c8ee75d77d24",
+      "name": "retorna erro inesperado"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        -112
+      ],
+      "id": "a2398025-059b-4c9e-87c5-029deb3272c2",
+      "name": "retorna erro inesperado1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        480
+      ],
+      "id": "ffd8c6ec-3e87-441a-b0e7-d6204868fce5",
+      "name": "retorna erro inesperado2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        944
+      ],
+      "id": "7b460bd1-10ad-4a8c-a603-bed2a5f76e28",
+      "name": "retorna erro inesperado3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        1488
+      ],
+      "id": "cb85c25e-a358-4322-b3f5-edf6040da5f8",
+      "name": "retorna erro inesperado4"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        2000
+      ],
+      "id": "48faf4a4-7a22-4227-97cf-8dcc55bb8cd2",
+      "name": "retorna erro inesperado5"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        1376
+      ],
+      "id": "8a81d681-e68d-431f-b3f5-a7a3a7b618fa",
+      "name": "retorna erro inesperado6"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        1824
+      ],
+      "id": "b9bcf43c-30a4-4dd5-8be3-5aa71921c1ee",
+      "name": "retorna erro inesperado7"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        2608
+      ],
+      "id": "597848d0-6bdf-48eb-84de-22df553f779b",
+      "name": "retorna erro inesperado8"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        2432
+      ],
+      "id": "a9807e6e-9a37-46f6-aa79-9baa8653f20d",
+      "name": "retorna erro inesperado9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mensagem = $json.body.mensagem ?? null;\n\nconst id = $json.params.id\n\nconst erros = [];\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nif (!mensagem) {\n    erros.push('mensagem é obrigatória');\n} else if (typeof mensagem !== 'string' || mensagem.trim().length < 5) {\n    erros.push('mensagem inválida');\n}\n\nif (!isUuid) {\n  erros.push(\"UUID inválido\")\n}\n\nreturn [{\n    json: {\n        id,\n        mensagem,\n        erros,\n        valido: erros.length === 0\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        2608
+      ],
+      "id": "f96296bb-f85b-4152-af38-0a033c17d0fa",
+      "name": "validação mensagem + id"
     }
   ],
   "pinData": {},
@@ -1613,6 +1742,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado1",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1660,6 +1796,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1697,6 +1840,13 @@
         [
           {
             "node": "retorna tickets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado2",
             "type": "main",
             "index": 0
           }
@@ -1744,6 +1894,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado3",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1751,47 +1908,7 @@
       "main": [
         [
           {
-            "node": "validação UUID ",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "validação UUID ": {
-      "main": [
-        [
-          {
-            "node": "UUID válido? ",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "UUID válido? ": {
-      "main": [
-        [
-          {
-            "node": "validação mensagem",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "retorna erro de UUID1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "validação mensagem": {
-      "main": [
-        [
-          {
-            "node": "mensagem validada?",
+            "node": "validação mensagem + id",
             "type": "main",
             "index": 0
           }
@@ -1824,6 +1941,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado8",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1853,6 +1977,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado9",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1861,6 +1992,13 @@
         [
           {
             "node": "ticket encontrado?2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado5",
             "type": "main",
             "index": 0
           }
@@ -1890,6 +2028,13 @@
         [
           {
             "node": "retorna No Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado7",
             "type": "main",
             "index": 0
           }
@@ -1930,6 +2075,13 @@
         [
           {
             "node": "ticket encontrado?3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado4",
             "type": "main",
             "index": 0
           }
@@ -1978,6 +2130,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado6",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1991,6 +2150,17 @@
           }
         ]
       ]
+    },
+    "validação mensagem + id": {
+      "main": [
+        [
+          {
+            "node": "mensagem validada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -1998,7 +2168,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "8c4e4fd3-288a-4e0e-b9c2-4dac372a3ae0",
+  "versionId": "0a34a1ba-75a3-4869-ae03-60a82bb77832",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"

@@ -12,8 +12,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        896,
-        -96
+        1344,
+        -256
       ],
       "id": "b63f514a-de84-4e68-9192-92f969757b6c",
       "name": "retorna cliente registrado"
@@ -81,7 +81,7 @@
       "typeVersion": 2.3,
       "position": [
         896,
-        368
+        304
       ],
       "id": "58555727-60dd-465d-8aea-0a7d77c1a564",
       "name": "cliente encontrado?"
@@ -96,7 +96,7 @@
       "typeVersion": 1.5,
       "position": [
         1120,
-        288
+        224
       ],
       "id": "2fc7967c-52cd-4c20-8a6c-03caaad96adf",
       "name": "retorna dados do cliente"
@@ -131,7 +131,9 @@
       "parameters": {
         "respondWith": "json",
         "responseBody": "{\n  \"erro\": \"UUID inválido\"\n}",
-        "options": {}
+        "options": {
+          "responseCode": 400
+        }
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
@@ -154,7 +156,7 @@
       "typeVersion": 1.5,
       "position": [
         1120,
-        464
+        400
       ],
       "id": "02d87172-41a3-4451-94f7-4e2107169269",
       "name": "retorna mensagem 404"
@@ -313,13 +315,16 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
         "respondWith": "json",
         "responseBody": "{\n  \"erro\": \"UUID inválido\"\n}",
-        "options": {}
+        "options": {
+          "responseCode": 400
+        }
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
@@ -359,7 +364,7 @@
       "typeVersion": 2.7,
       "position": [
         1120,
-        752
+        688
       ],
       "id": "6e83f58d-0731-40eb-a1ed-5925b090c579",
       "name": "remove cliente",
@@ -369,24 +374,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\n  \"erro\": \"Cliente não encontrado\"\n}",
-        "options": {
-          "responseCode": 404
-        }
       },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        1120,
-        944
-      ],
-      "id": "0a6b4467-3604-4353-99c1-db5ef17d8af6",
-      "name": "retorna mensagem "
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -398,8 +387,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1376,
-        752
+        1360,
+        624
       ],
       "id": "d8c09b17-67cd-4e19-b671-cf528a303aad",
       "name": "retorna No Content"
@@ -433,7 +422,7 @@
       "typeVersion": 2.3,
       "position": [
         896,
-        848
+        784
       ],
       "id": "55f0b375-21f7-4e49-a3f9-462819d115ba",
       "name": "cliente encontrado? 1"
@@ -460,7 +449,8 @@
           "id": "qma1LsRWH0YqLv1Z",
           "name": "Postgres account 6"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -478,9 +468,9 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "nome": "={{ $json.nome }}",
-            "email": "={{ $json.email }}",
-            "telefone": "={{ $json.telefone }}"
+            "nome": "={{ $('campos validados?').first().json.nome }}",
+            "email": "={{ $('campos validados?').first().json.email }}",
+            "telefone": "={{ $('campos validados?').first().json.telefone }}"
           },
           "matchingColumns": [
             "id"
@@ -542,8 +532,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.7,
       "position": [
-        672,
-        -96
+        1120,
+        -256
       ],
       "id": "79693d72-d083-49a3-946c-0ee77dde3489",
       "name": "persiste cliente",
@@ -569,6 +559,184 @@
       "id": "8188d1d8-f24b-433a-b375-cb99224d164e",
       "name": "consultar cliente",
       "webhookId": "9c3159f4-0551-4fc3-8b36-ff9495a70a82"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "email",
+              "value": "={{ $json.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "2aded34f-7568-4b6d-9b30-07d43b0e5b65",
+      "name": "checa email existente",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Este email já está em uso\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        -80
+      ],
+      "id": "e59efc79-f7d7-43f5-b80d-23581cf2f775",
+      "name": "responde com erro de email em uso"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ae53d761-b567-41fb-ac68-d2eb7337992f",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        -176
+      ],
+      "id": "186ec76b-ac7d-4f09-b9c7-d3a9f4ff1396",
+      "name": "email disponível?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Cliente não encontrado\"\n}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        880
+      ],
+      "id": "0a6b4467-3604-4353-99c1-db5ef17d8af6",
+      "name": "retorna não encontrado"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        -32
+      ],
+      "id": "a6e6945f-9f6e-4cea-a300-ecb6960f103d",
+      "name": "retorna erro inesperado"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        448
+      ],
+      "id": "2ef8e158-8797-46bb-bf0f-76f8560da93e",
+      "name": "retorna erro inesperado1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        928
+      ],
+      "id": "555a850f-ad27-48cc-b488-f13e43c449fa",
+      "name": "retorna erro inesperado2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1360,
+        768
+      ],
+      "id": "f48dd5c1-6637-4b88-bb31-fb44f13d06df",
+      "name": "retorna erro inesperado3"
     }
   ],
   "pinData": {},
@@ -646,7 +814,7 @@
       "main": [
         [
           {
-            "node": "persiste cliente",
+            "node": "checa email existente",
             "type": "main",
             "index": 0
           }
@@ -708,6 +876,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado1",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -716,6 +891,13 @@
         [
           {
             "node": "retorna No Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado3",
             "type": "main",
             "index": 0
           }
@@ -733,7 +915,7 @@
         ],
         [
           {
-            "node": "retorna mensagem ",
+            "node": "retorna não encontrado",
             "type": "main",
             "index": 0
           }
@@ -745,6 +927,13 @@
         [
           {
             "node": "cliente encontrado? 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado2",
             "type": "main",
             "index": 0
           }
@@ -772,6 +961,42 @@
           }
         ]
       ]
+    },
+    "checa email existente": {
+      "main": [
+        [
+          {
+            "node": "email disponível?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email disponível?": {
+      "main": [
+        [
+          {
+            "node": "persiste cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "responde com erro de email em uso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -779,7 +1004,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "27bbaec7-44e9-474f-9ac2-a659d7b6970e",
+  "versionId": "1d97d1c9-e276-47aa-875d-f59f1bdaa2b5",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"
