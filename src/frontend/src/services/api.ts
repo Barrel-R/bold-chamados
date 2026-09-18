@@ -140,10 +140,38 @@ export async function updateStatus(
     id: string,
     status: Status,
 ): Promise<Ticket> {
-    return request<Ticket>(`${TICKET_API_URL}/tickets/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-    })
+    const response = await fetch(
+        `/api/tickets/${id}/status`,
+        {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status,
+            }),
+        },
+    )
+
+    if (!response.ok) {
+        let message = `Erro HTTP ${response.status}`
+
+        try {
+            const data = await response.json()
+
+            message =
+                data.erro ??
+                data.error ??
+                data.message ??
+                message
+        } catch {
+            // resposta não JSON
+        }
+
+        throw new Error(message)
+    }
+
+    return response.json()
 }
 
 export async function deleteTicket(id: string): Promise<void> {
