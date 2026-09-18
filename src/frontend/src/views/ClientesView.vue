@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import type { Cliente } from '@/types'
 import {
+    ApiError,
     deleteCliente,
     getClientes,
 } from '@/services/api'
@@ -18,10 +19,11 @@ async function loadClientes() {
     try {
         clientes.value = await getClientes()
     } catch (err) {
-        error.value =
-            err instanceof Error
-                ? err.message
-                : 'Não foi possível carregar os clientes'
+        if (err instanceof ApiError) {
+            error.value = err.message
+        } else {
+            error.value = 'Não foi possível obter os clientes'
+        }
     } finally {
         loading.value = false
     }
