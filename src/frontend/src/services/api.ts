@@ -201,7 +201,18 @@ export async function getInteracoes(
 // Clientes
 
 export async function getClientes(): Promise<Cliente[]> {
-    return request<Cliente[]>(`${API_URL}/clientes`)
+    const data = await request<Cliente[]>(`${API_URL}/clientes`)
+
+    if (!Array.isArray(data)) {
+        return []
+    }
+
+    return data.filter(
+        (cliente) =>
+            cliente &&
+            typeof cliente.id === 'string' &&
+            cliente.id.length > 0,
+    )
 }
 
 export async function getCliente(id: string): Promise<Cliente> {

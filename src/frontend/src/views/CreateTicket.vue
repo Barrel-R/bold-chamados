@@ -112,6 +112,13 @@ onMounted(loadClientes)
                             {{ cliente.nome }}
                         </option>
                     </select>
+
+                    <div v-if="!loadingClientes && clientes.length === 0"
+                        class="mt-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3">
+                        <p class="text-sm font-medium text-orange-700">
+                            Parece que não há clientes registrados.
+                        </p>
+                    </div>
                 </div>
 
                 <div>
@@ -174,13 +181,9 @@ onMounted(loadClientes)
                     </div>
 
                     <div class="pt-2">
-                        <button type="submit" :disabled="loading || loadingClientes"
+                        <button type="submit" :disabled="loading || loadingClientes || clientes.length === 0"
                             class="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50">
-                            {{
-                                loading
-                                    ? 'Criando ticket...'
-                                    : 'Criar ticket'
-                            }}
+                            {{ loading ? 'Criando ticket...' : 'Criar ticket' }}
                         </button>
                     </div>
                 </div>

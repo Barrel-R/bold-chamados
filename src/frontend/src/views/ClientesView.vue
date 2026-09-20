@@ -56,11 +56,21 @@ async function removeCliente(cliente: Cliente) {
     }
 }
 
-function formatDate(date: string) {
+function formatDate(date?: string | null) {
+    if (!date) {
+        return '-'
+    }
+
+    const parsed = new Date(date)
+
+    if (Number.isNaN(parsed.getTime())) {
+        return '-'
+    }
+
     return new Intl.DateTimeFormat('pt-BR', {
         dateStyle: 'short',
         timeStyle: 'short',
-    }).format(new Date(date))
+    }).format(parsed)
 }
 
 onMounted(loadClientes)
