@@ -1,0 +1,477 @@
+openapi: 3.0.3
+
+info:
+  title: Bold Chamados API
+  version: 1.0.0
+  description: |
+    API utilizada pelo frontend do desafio técnico de chamados.
+
+    Os endpoints são implementados por workflows no n8n, com persistência em
+    PostgreSQL/Supabase.
+
+    Observação: no deploy do frontend, a atualização de status pode passar por
+    uma Vercel Function como proxy para contornar uma limitação de CORS da
+    infraestrutura fornecida. O contrato do backend continua sendo
+    PATCH /tickets/{id}.
+
+servers:
+  - url: https://dev.boldsolution.com.br/webhook/desafio
+    description: Produção n8n
+  - url: https://dev.boldsolution.com.br/webhook-test/desafio
+    description: Ambiente de teste n8n
+
+tags:
+  - name: Clientes
+  - name: Tickets
+  - name: Interações
+
+paths:
+  /clientes:
+    get:
+      tags: [Clientes]
+      summary: Listar clientes
+      operationId: getClientes
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags: [Clientes]
+      summary: Criar cliente
+      operationId: createCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClienteInput'
+            example:
+              nome: Grupo Vetor
+              email: contato@grupovetor.com
+              telefone: "(75) 91234-5678"
+      responses:
+        '201':
+          description: Cliente criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /clientes/{id}:
+    get:
+      tags: [Clientes]
+      summary: Buscar cliente por ID
+      operationId: getCliente
+      parameters:
+        - $ref: '#/components/parameters/ClienteId'
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags: [Clientes]
+      summary: Remover cliente
+      description: Remove um cliente quando permitido pelas regras de negócio.
+      operationId: deleteCliente
+      parameters:
+        - $ref: '#/components/parameters/ClienteId'
+      responses:
+        '204':
+          description: Cliente removido com sucesso
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tickets:
+    get:
+      tags: [Tickets]
+      summary: Listar tickets
+      description: Retorna tickets ordenados por data de criação decrescente, com filtros opcionais.
+      operationId: getTickets
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Status'
+        - name: prioridade
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Prioridade'
+      responses:
+        '200':
+          description: Lista de tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketListItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags: [Tickets]
+      summary: Criar ticket
+      description: Cria um ticket vinculado a um cliente. O protocolo é gerado pelo backend.
+      operationId: createTicket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicketInput'
+            example:
+              cliente_id: 9e6ce773-c732-4efa-ae7e-7de0384c8911
+              titulo: Erro ao acessar relatório
+              descricao: O usuário não consegue acessar o relatório mensal.
+              prioridade: alta
+      responses:
+        '201':
+          description: Ticket criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Cliente vinculado não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tickets/{id}:
+    get:
+      tags: [Tickets]
+      summary: Buscar ticket por ID
+      operationId: getTicket
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '200':
+          description: Ticket encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags: [Tickets]
+      summary: Atualizar status do ticket
+      description: Atualiza somente o status do ticket.
+      operationId: updateTicketStatus
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTicketStatusInput'
+            example:
+              status: aguardando_cliente
+      responses:
+        '200':
+          description: Ticket atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags: [Tickets]
+      summary: Remover ticket
+      operationId: deleteTicket
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '204':
+          description: Ticket removido com sucesso
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tickets/{id}/interacoes:
+    get:
+      tags: [Interações]
+      summary: Listar interações de um ticket
+      operationId: getInteracoes
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '200':
+          description: Histórico de interações do ticket
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Interacao'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags: [Interações]
+      summary: Adicionar interação ao ticket
+      operationId: createInteracao
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInteracaoInput'
+            example:
+              tipo: comentario
+              mensagem: Cliente informou que o problema continua.
+      responses:
+        '201':
+          description: Interação criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interacao'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  parameters:
+    ClienteId:
+      name: id
+      in: path
+      required: true
+      description: UUID do cliente
+      schema:
+        type: string
+        format: uuid
+    TicketId:
+      name: id
+      in: path
+      required: true
+      description: UUID do ticket
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    Status:
+      type: string
+      enum: [aberto, em_atendimento, aguardando_cliente, resolvido, cancelado]
+
+    Prioridade:
+      type: string
+      enum: [baixa, media, alta]
+
+    Tipo:
+      type: string
+      enum: [comentario, sistema, atualizacao_status]
+
+    Cliente:
+      type: object
+      required: [id, nome, email, telefone, criado_em]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        telefone:
+          type: string
+          example: "(75) 91234-5678"
+        criado_em:
+          type: string
+          format: date-time
+
+    Ticket:
+      type: object
+      required: [id, protocolo, cliente_id, titulo, descricao, prioridade, status, criado_em, atualizado_em]
+      properties:
+        id:
+          type: string
+          format: uuid
+        protocolo:
+          type: string
+          maxLength: 20
+          example: TK-2026-000001
+        cliente_id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        descricao:
+          type: string
+        prioridade:
+          $ref: '#/components/schemas/Prioridade'
+        status:
+          $ref: '#/components/schemas/Status'
+        criado_em:
+          type: string
+          format: date-time
+        atualizado_em:
+          type: string
+          format: date-time
+
+    TicketListItem:
+      allOf:
+        - $ref: '#/components/schemas/Ticket'
+        - type: object
+          required: [cliente_nome]
+          properties:
+            cliente_nome:
+              type: string
+              description: Nome do cliente retornado pelo JOIN da listagem
+
+    Interacao:
+      type: object
+      required: [id, ticket_id, tipo, mensagem, criado_em]
+      properties:
+        id:
+          type: string
+          format: uuid
+        ticket_id:
+          type: string
+          format: uuid
+        tipo:
+          $ref: '#/components/schemas/Tipo'
+          enum: [comentario, sistema, atualizacao_status]
+
+        mensagem:
+          type: string
+        criado_em:
+          type: string
+          format: date-time
+
+    CreateClienteInput:
+      type: object
+      required: [nome, email, telefone]
+      properties:
+        nome:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          format: email
+        telefone:
+          type: string
+          description: Telefone brasileiro formatado
+          pattern: '^\([1-9]{2}\) (?:[2-8][0-9]{3}|9[0-9]{4})-[0-9]{4}$'
+          example: "(75) 91234-5678"
+
+    CreateTicketInput:
+      type: object
+      required: [cliente_id, titulo, descricao, prioridade]
+      properties:
+        cliente_id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+          minLength: 2
+        descricao:
+          type: string
+          minLength: 8
+        prioridade:
+          $ref: '#/components/schemas/Prioridade'
+
+    UpdateTicketStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/Status'
+
+    CreateInteracaoInput:
+      type: object
+      required: [tipo, mensagem]
+      properties:
+        tipo:
+          $ref: "#/components/schemas/Tipo"
+          example: comentario
+        mensagem:
+          type: string
+          minLength: 5
+
+    Erro:
+      type: object
+      properties:
+        erro:
+          type: string
+          example: Dados inválidos
+        detalhes:
+          type: array
+          items:
+            type: string
+          example: [status inválido]
+
+  responses:
+    BadRequest:
+      description: Dados inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+    InternalServerError:
+      description: Erro interno
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
