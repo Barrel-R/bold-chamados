@@ -88,7 +88,7 @@ function handleTelefoneInput(event: Event) {
                         Nome
                     </label>
 
-                    <input id="nome" v-model="nome" type="text"
+                    <input id="nome" v-model="nome" type="text" required minlength="2"
                         class="w-full rounded-xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
                         placeholder="Nome do cliente" />
                 </div>

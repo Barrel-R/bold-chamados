@@ -125,11 +125,11 @@ onMounted(loadClientes)
                 </div>
 
                 <div>
-                    <label for="descricao" class="mb-2 block text-sm font-medium">
+                    <label for="descricao" required minlength="8" class="mb-2 block text-sm font-medium">
                         Descrição
                     </label>
 
-                    <textarea id="descricao" v-model="descricao" rows="6"
+                    <textarea id="descricao" v-model="descricao" rows="6" required minlength="8"
                         class="w-full resize-none rounded-xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
                         placeholder="Descreva o problema com mais detalhes..." />
                 </div>
