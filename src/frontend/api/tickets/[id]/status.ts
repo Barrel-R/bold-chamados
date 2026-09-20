@@ -30,7 +30,7 @@ export default async function handler(
     }
 
     try {
-        const response = await fetch(`${baseUrl}/${id}`, {
+        const response = await fetch(`${baseUrl}/${id}/status`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
