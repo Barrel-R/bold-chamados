@@ -38,9 +38,11 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "clientes",
+        "path": "desafio/clientes",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -232,9 +234,11 @@
     {
       "parameters": {
         "httpMethod": "DELETE",
-        "path": "clientes/:id",
+        "path": "desafio/clientes/:id",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -546,9 +550,11 @@
     },
     {
       "parameters": {
-        "path": "clientes/:id",
+        "path": "desafio/clientes/:id",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -737,6 +743,91 @@
       ],
       "id": "f48dd5c1-6637-4b88-bb31-fb44f13d06df",
       "name": "retorna erro inesperado3"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        464,
+        -544
+      ],
+      "id": "b0971095-2964-444b-b2b6-6641c4bdb519",
+      "name": "retorna dados do cliente1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Erro interno inesperado\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        464,
+        -368
+      ],
+      "id": "77ec4468-f7f2-468a-a5d3-d61b962cd540",
+      "name": "retorna erro inesperado4"
+    },
+    {
+      "parameters": {
+        "path": "desafio/clientes",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -464
+      ],
+      "id": "929f77ea-42a4-45f6-8f38-e82373489354",
+      "name": "listar clientes",
+      "webhookId": "9c3159f4-0551-4fc3-8b36-ff9495a70a82"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "limit": 100,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        224,
+        -464
+      ],
+      "id": "6938b250-29d6-4f83-900e-123c97d27322",
+      "name": "busca clientes",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
     }
   ],
   "pinData": {},
@@ -997,14 +1088,43 @@
           }
         ]
       ]
+    },
+    "listar clientes": {
+      "main": [
+        [
+          {
+            "node": "busca clientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca clientes": {
+      "main": [
+        [
+          {
+            "node": "retorna dados do cliente1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorna erro inesperado4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "1d97d1c9-e276-47aa-875d-f59f1bdaa2b5",
+  "versionId": "1944e9b8-eb96-48b9-9d43-1573a62e7c9b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"
