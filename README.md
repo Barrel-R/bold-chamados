@@ -101,31 +101,31 @@ Principais telas:
 - Rota: `/`
 - cards de status, filtros, tabela de tickets.
 
-![Caixa de Entrada](docs/screenshots/caixa_de_entrada.png)
+![Caixa de Entrada](src/docs/screenshots/caixa_de_entrada.png)
 
 - **Detalhe do ticket**: dados, histórico de interações, nova interação, mudança de status e botão de excluir.
 
-![Detalhes do Ticket](docs/screenshots/ticket_detalhes.png)
+![Detalhes do Ticket](src/docs/screenshots/ticket_detalhes.png)
 
-![Interações do Ticket](docs/screenshots/ticket_interacoes.png)
+![Interações do Ticket](src/docs/screenshots/ticket_interacoes.png)
 
 ## Novo Ticket
 - Rota: `/tickets/novo`
 - Formulário com validação nativa, carregamento de clientes e aviso caso não tenham clientes cadastrados.
 
-![Novo Ticket](docs/screenshots/ticket_novo.png)
+![Novo Ticket](src/docs/screenshots/ticket_novo.png)
 
 ### Clientes
 - Rota: `/clientes`
 - tabela de clientes, botão de navegação para cadastrar, remover clientes
 
-![Clientes](docs/screenshots/clientes.png)
+![Clientes](src/docs/screenshots/clientes.png)
 
 ### Novo Cliente
 - Rota: `/clientes/novo`
 - Formulário com validação nativa e máscara de telefone 
 
-![Novo Cliente](docs/screenshots/cliente_novo.png)
+![Novo Cliente](src/docs/screenshots/cliente_novo.png)
 
 ### CORS e Vercel Function
 
