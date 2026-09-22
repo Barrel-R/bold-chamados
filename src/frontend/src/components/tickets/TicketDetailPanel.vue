@@ -4,7 +4,7 @@ import type {
     Status,
 } from '@/types'
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useTicketsStore } from '@/stores/tickets'
 import { ApiError } from '@/services/api'
 
@@ -154,6 +154,12 @@ function formatDate(date?: string | null) {
         timeStyle: 'short',
     }).format(parsed)
 }
+
+watch(() => ticketsStore.selectedTicket?.id, () => {
+    novaMensagem.value = ""
+    interacaoCreateError.value = null
+    creatingInteracao.value = false
+})
 
 </script>
 
