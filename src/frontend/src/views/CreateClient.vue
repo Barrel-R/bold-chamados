@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ApiError, createCliente } from '@/services/api'
+import { useRouter } from 'vue-router'
 
 const nome = ref('')
 const email = ref('')
 const telefone = ref('')
 
+const router = useRouter()
 const loading = ref(false)
 const success = ref<string | null>(null)
 const error = ref<string | null>(null)
@@ -29,6 +31,10 @@ async function submit() {
         nome.value = ''
         email.value = ''
         telefone.value = ''
+
+        setTimeout(() => {
+            router.push('/')
+        }, 800)
     } catch (err) {
         if (err instanceof ApiError) {
             error.value = err.message
