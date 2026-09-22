@@ -6,6 +6,7 @@ import type {
     Prioridade,
 } from '@/types'
 import type { TicketListItem } from '@/types/ticket'
+import { useApiVersionStore, type ApiVersion } from '@/stores/apiVersion'
 
 export class ApiError extends Error {
     status: number
@@ -38,9 +39,12 @@ async function request<T>(
     path: string,
     options: RequestInit = {},
 ): Promise<T> {
+    const apiVersion = useApiVersionStore()
+
+    const versionedUrl = withApiVersion(path, apiVersion.version)
     const hasBody = options.body !== undefined
 
-    const response = await fetch(`${path}`, {
+    const response = await fetch(`${versionedUrl}`, {
         ...options,
 
         headers: {
@@ -140,8 +144,10 @@ export async function updateStatus(
     id: string,
     status: Status,
 ): Promise<Ticket> {
+    const apiVersion = useApiVersionStore()
+
     const response = await fetch(
-        `/api/tickets/${id}/status`,
+        `/api/tickets/${id}/status?version=${apiVersion.version}`,
         {
             method: 'PATCH',
             headers: {
@@ -234,4 +240,20 @@ export async function deleteCliente(id: string): Promise<void> {
     return request<void>(`${CLIENT_API_URL}/clientes/${id}`, {
         method: 'DELETE',
     })
+}
+
+// Api Version
+
+export function withApiVersion(
+    url: string,
+    version: ApiVersion,
+) {
+    if (version === 'v1') {
+        return url
+    }
+
+    return url.replace(
+        '/desafio/',
+        '/desafio/v2/',
+    )
 }

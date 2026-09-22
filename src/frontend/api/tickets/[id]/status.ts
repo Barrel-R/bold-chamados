@@ -13,7 +13,7 @@ export default async function handler(
         })
     }
 
-    const { id } = req.query
+    const { id, version } = req.query
 
     if (typeof id !== 'string') {
         return res.status(400).json({
@@ -29,8 +29,16 @@ export default async function handler(
         })
     }
 
+    const targetUrl =
+        version === 'v2'
+            ? baseUrl.replace(
+                '/desafio/',
+                '/desafio/v2/',
+            )
+            : baseUrl
+
     try {
-        const response = await fetch(`${baseUrl}/${id}`, {
+        const response = await fetch(`${targetUrl}/${id}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
