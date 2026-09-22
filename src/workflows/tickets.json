@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { id, valido: isUuid }"
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -33,7 +33,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body = $input.first().json.body ?? {};\n\nconst { cliente_id, titulo, descricao, prioridade } = body;\n\nconst erros = [];\n\nconst PRIORIDADES_PERMITIDAS = [\"baixa\", \"media\", \"alta\"]\n\nconst isUuid = (value) =>\n    typeof value === 'string' &&\n    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(value);\n\nif (!cliente_id) {\n    erros.push('cliente_id é obrigatório');\n} else if (!isUuid(cliente_id)) {\n    erros.push('cliente_id inválido');\n}\n\nif (!titulo) {\n    erros.push('título é obrigatório');\n} else if (typeof titulo !== 'string' || titulo.trim().length < 2) {\n    erros.push('título inválido');\n}\n\nif (!descricao) {\n    erros.push('descrição é obrigatória');\n} else if (typeof descricao !== 'string' || descricao.trim().length < 8) {\n    erros.push('descrição deve ter pelo menos 8 caracteres');\n}\n\nif (prioridade && !PRIORIDADES_PERMITIDAS.includes(prioridade)) {\n  erros.push(\"prioridade inválida\")\n}\n\nreturn [{\n    json: {\n        cliente_id,\n        titulo,\n        descricao,\n        prioridade: prioridade ?? \"media\",\n        erros,\n        valido: erros.length === 0,\n        trace_id: $execution.id,\n        started_at: Date.now(),\n    }\n}];"
+        "jsCode": "const body = $input.first().json.body ?? {};\n\nconst { cliente_id, titulo, descricao, prioridade } = body;\n\nconst erros = [];\n\nconst PRIORIDADES_PERMITIDAS = [\"baixa\", \"media\", \"alta\"]\n\nconst isUuid = (value) =>\n    typeof value === 'string' &&\n    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(value);\n\nif (!cliente_id) {\n    erros.push('cliente_id é obrigatório');\n} else if (!isUuid(cliente_id)) {\n    erros.push('cliente_id inválido');\n}\n\nif (!titulo) {\n    erros.push('título é obrigatório');\n} else if (typeof titulo !== 'string' || titulo.trim().length < 2) {\n    erros.push('título inválido');\n}\n\nif (!descricao) {\n    erros.push('descrição é obrigatória');\n} else if (typeof descricao !== 'string' || descricao.trim().length < 8) {\n    erros.push('descrição deve ter pelo menos 8 caracteres');\n}\n\nif (prioridade && !PRIORIDADES_PERMITIDAS.includes(prioridade)) {\n  erros.push(\"prioridade inválida\")\n}\n\nreturn {\n  cliente_id,\n  titulo,\n  descricao,\n  prioridade: prioridade ?? \"media\",\n  erros,\n  valido: erros.length === 0,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -131,7 +131,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { id, valido: isUuid }"
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -509,7 +509,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ {\n  \"erro\": $json.erros\n}\n}}",
+        "responseBody": "={{ {\n  \"erro\": \"Parâmetros inválidos\",\n  \"detalhes\": $json.erros\n}\n}}",
         "options": {
           "responseCode": 400
         }
@@ -541,7 +541,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const query = $json.query ?? {};\n\nconst STATUS_VALIDOS = [\n  'aberto',\n  'em_atendimento',\n  'aguardando_cliente',\n  'resolvido',\n  'cancelado'\n];\n\nconst PRIORIDADES_VALIDAS = [\n  'baixa',\n  'media',\n  'alta'\n];\n\nconst status = query.status?.trim() || null;\nconst prioridade = query.prioridade?.trim() || null;\n\nconst erros = [];\n\nif (status && !STATUS_VALIDOS.includes(status)) {\n  erros.push('status inválido');\n}\n\nif (prioridade && !PRIORIDADES_VALIDAS.includes(prioridade)) {\n  erros.push('prioridade inválida');\n}\n\nif (erros.length > 0) {\n  return [{\n    json: {\n      valido: false,\n      erros\n    }\n  }];\n}\n\nlet sql = `\n  select\n    t.*,\n    c.nome as cliente_nome\n  from tickets t\n  join clientes c on c.id = t.cliente_id\n  where 1=1\n`;\n\nconst params = [];\n\nif (status) {\n  params.push(status);\n  sql += ` and t.status = $${params.length}`;\n}\n\nif (prioridade) {\n  params.push(prioridade);\n  sql += ` and t.prioridade = $${params.length}`;\n}\n\nsql += ' order by t.criado_em desc';\n\nreturn [{\n  json: {\n    valido: true,\n    sql,\n    params\n  }\n}];"
+        "jsCode": "const query = $json.query ?? {};\n\nconst STATUS_VALIDOS = [\n  'aberto',\n  'em_atendimento',\n  'aguardando_cliente',\n  'resolvido',\n  'cancelado'\n];\n\nconst PRIORIDADES_VALIDAS = [\n  'baixa',\n  'media',\n  'alta'\n];\n\nconst status = query.status?.trim() || null;\nconst prioridade = query.prioridade?.trim() || null;\n\nconst erros = [];\n\nif (status && !STATUS_VALIDOS.includes(status)) {\n  erros.push('status inválido');\n}\n\nif (prioridade && !PRIORIDADES_VALIDAS.includes(prioridade)) {\n  erros.push('prioridade inválida');\n}\n\nif (erros.length > 0) {\n  return [{\n    json: {\n      valido: false,\n      erros\n    }\n  }];\n}\n\nlet sql = `\n  select\n    t.*,\n    c.nome as cliente_nome\n  from tickets t\n  join clientes c on c.id = t.cliente_id\n  where 1=1\n`;\n\nconst params = [];\n\nif (status) {\n  params.push(status);\n  sql += ` and t.status = $${params.length}`;\n}\n\nif (prioridade) {\n  params.push(prioridade);\n  sql += ` and t.prioridade = $${params.length}`;\n}\n\nsql += ' order by t.criado_em desc';\n\nreturn {\n  valido: true,\n  sql,\n  params\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1100,7 +1100,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const id = $json.params.id;\nconst { status } = $json.body ?? {};\nconst erros = [];\n\nconst STATUS_VALIDOS = ['aberto', 'em_atendimento', 'aguardando_cliente', 'resolvido', 'cancelado'];\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nif (!isUuid) erros.push(\"ID inválido\")\n\nif (!status) erros.push('status é obrigatório');\nelse if (!STATUS_VALIDOS.includes(status)) erros.push('status inválido');\n\nreturn [{ json: { id, status, erros, valido: erros.length === 0 } }];"
+        "jsCode": "const id = $json.params.id;\nconst { status } = $json.body ?? {};\nconst erros = [];\n\nconst STATUS_VALIDOS = ['aberto', 'em_atendimento', 'aguardando_cliente', 'resolvido', 'cancelado'];\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nif (!isUuid) erros.push(\"ID inválido\")\n\nif (!status) erros.push('status é obrigatório');\nelse if (!STATUS_VALIDOS.includes(status)) erros.push('status inválido');\n\nreturn { \n  id, \n  status, \n  erros, \n  valido: erros.length === 0 \n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1148,7 +1148,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ {\n  \"erros\": $json.erros\n  }\n}}",
+        "responseBody": "={{ {\n  \"erro\": \"Dados inválidos\",\n  \"detalhes\": $json.erros\n  }\n}}",
         "options": {
           "responseCode": 400
         }
@@ -1630,7 +1630,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const mensagem = $json.body.mensagem ?? null;\n\nconst id = $json.params.id\n\nconst erros = [];\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nif (!mensagem) {\n    erros.push('mensagem é obrigatória');\n} else if (typeof mensagem !== 'string' || mensagem.trim().length < 5) {\n    erros.push('mensagem inválida');\n}\n\nif (!isUuid) {\n  erros.push(\"UUID inválido\")\n}\n\nreturn [{\n    json: {\n        id,\n        mensagem,\n        erros,\n        valido: erros.length === 0\n    }\n}];"
+        "jsCode": "const body = $json.body ?? {};\nconst params = $json.params ?? {};\n\nconst { mensagem } = body;\nconst { id } = params;\n\nconst erros = [];\n\nconst isUuid = (value) =>\n  typeof value === 'string' &&\n  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(\n    value,\n  );\n\nif (id === undefined || id === null || id === '') {\n  erros.push('ID do ticket é obrigatório');\n} else if (typeof id !== 'string') {\n  erros.push('ID do ticket deve ser um texto');\n} else if (!isUuid(id.trim())) {\n  erros.push('ID do ticket deve ser um UUID válido');\n}\n\nif (\n  mensagem === undefined ||\n  mensagem === null ||\n  mensagem === ''\n) {\n  erros.push('mensagem é obrigatória');\n} else if (typeof mensagem !== 'string') {\n  erros.push('mensagem deve ser um texto');\n} else if (mensagem.trim().length < 5) {\n  erros.push('mensagem deve ter pelo menos 5 caracteres');\n}\n\nreturn {\n  id:\n    typeof id === 'string'\n      ? id.trim()\n      : id,\n\n  mensagem:\n    typeof mensagem === 'string'\n      ? mensagem.trim()\n      : mensagem,\n\n  erros,\n  valido: erros.length === 0,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -2321,7 +2321,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "ca46e375-a364-44aa-83d6-b82eaafb408e",
+  "versionId": "c9b2f633-ed2b-444a-98ba-d64c0f24945b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"

@@ -105,7 +105,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { id, valido: isUuid }"
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -118,7 +118,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { nome, email, telefone } = $input.first().json.body;\n\nconst erros = [];\n\nif (!nome || nome.trim().length < 2) erros.push(\"nome é obrigatório\");\nif (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) erros.push(\"email inválido\");\nif (!telefone || telefone.trim().length < 8) erros.push(\"telefone é obrigatório\");\nelse if (!/^\\([1-9]{2}\\) (?:[2-8]|9[0-9])[0-9]{3}\\-[0-9]{4}$/.test(telefone)) erros.push(\"telefone inválido\")\n\nreturn [{ json: { nome, email, telefone, erros, valido: erros.length === 0 } }];"
+        "jsCode": "const body = $input.first().json.body ?? {};\n\nconst {\n  nome,\n  email,\n  telefone,\n} = body;\n\nconst erros = [];\n\n// Nome\nif (nome === undefined || nome === null || nome === '') {\n  erros.push('nome é obrigatório');\n} else if (typeof nome !== 'string') {\n  erros.push('nome deve ser um texto');\n} else if (nome.trim().length < 2) {\n  erros.push('nome deve ter pelo menos 2 caracteres');\n}\n\n// Email\nif (email === undefined || email === null || email === '') {\n  erros.push('email é obrigatório');\n} else if (typeof email !== 'string') {\n  erros.push('email deve ser um texto');\n} else if (\n  !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())\n) {\n  erros.push('email inválido');\n}\n\n// Telefone\nif (\n  telefone === undefined ||\n  telefone === null ||\n  telefone === ''\n) {\n  erros.push('telefone é obrigatório');\n} else if (typeof telefone !== 'string') {\n  erros.push('telefone deve ser um texto');\n} else {\n  const telefoneNormalizado = telefone.trim();\n\n  if (\n    !/^\\([1-9]{2}\\) (?:[2-8][0-9]{3}|9[0-9]{4})-[0-9]{4}$/.test(\n      telefoneNormalizado,\n    )\n  ) {\n    erros.push(\n      'telefone inválido; use o formato (DD) 99999-9999 ou (DD) 9999-9999',\n    );\n  }\n}\n\nreturn {\n  nome: typeof nome === 'string' ? nome.trim() : nome,\n  email: typeof email === 'string' ? email.trim() : email,\n  telefone:\n    typeof telefone === 'string' ? telefone.trim() : telefone,\n  erros,\n  valido: erros.length === 0,\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -252,7 +252,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { id, valido: isUuid }"
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1124,7 +1124,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "1944e9b8-eb96-48b9-9d43-1573a62e7c9b",
+  "versionId": "d421ed71-5961-4b97-ae6e-2415b7031142",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"

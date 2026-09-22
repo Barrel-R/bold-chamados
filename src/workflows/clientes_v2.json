@@ -1,0 +1,2055 @@
+{
+  "name": "clientes v2",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "limit": 100,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -2736,
+        176
+      ],
+      "id": "b32d3784-71ca-44fd-98e5-c3503ee83bba",
+      "name": "busca clientes",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -2064,
+        80
+      ],
+      "id": "07b348b2-4acb-4fc8-97ae-5b95fcc1dc97",
+      "name": "retorna resposta1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n \"trace_id\": {{ $execution.id }},\n \"started_at\": {{ Date.now() }},\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2960,
+        176
+      ],
+      "id": "cc3a65f3-56a4-43f2-8a7a-a362f6a79f69",
+      "name": "salva trace_id"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('salva trace_id').item.json.trace_id }}",
+            "workflow": "Listar clientes",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=GET",
+            "rota": "=/desafio/v2/clientes",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('salva trace_id').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -2064,
+        272
+      ],
+      "id": "c0e5a937-636d-4374-bae5-468692731e08",
+      "name": "registra log1",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"cliente.listagem_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2288,
+        320
+      ],
+      "id": "a6c343b6-eafa-4072-9ec7-2b75b690579a",
+      "name": "prepara erro de banco2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"cliente.listado\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json.response }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2288,
+        32
+      ],
+      "id": "375a7544-9d33-4291-b97a-22e99bc2f18e",
+      "name": "prepara sucesso1"
+    },
+    {
+      "parameters": {
+        "path": "desafio/v2/clientes",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3184,
+        176
+      ],
+      "id": "b19ca0e8-4db5-46cd-9297-7ceee2a90322",
+      "name": "listar clientes",
+      "webhookId": "9c3159f4-0551-4fc3-8b36-ff9495a70a82"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all()\n\nreturn {\n  response: items.map(item => item.json),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2512,
+        32
+      ],
+      "id": "1e43a9cc-e43f-4ea5-8d02-6a8ea51061bf",
+      "name": "agrega itens"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "desafio/v2/clientes",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3184,
+        928
+      ],
+      "id": "5558e506-dc56-4099-8f6e-ac2760fe8ef1",
+      "name": "cadastrar cliente",
+      "webhookId": "d864f352-2294-4ec9-90f6-18c01e5b5add"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? {};\n\nconst {\n  nome,\n  email,\n  telefone,\n} = body;\n\nconst erros = [];\n\nif (nome === undefined || nome === null || nome === '') {\n  erros.push('nome é obrigatório');\n} else if (typeof nome !== 'string') {\n  erros.push('nome deve ser um texto');\n} else if (nome.trim().length < 2) {\n  erros.push('nome deve ter pelo menos 2 caracteres');\n}\n\nif (email === undefined || email === null || email === '') {\n  erros.push('email é obrigatório');\n} else if (typeof email !== 'string') {\n  erros.push('email deve ser um texto');\n} else if (\n  !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())\n) {\n  erros.push('email inválido');\n}\n\nif (\n  telefone === undefined ||\n  telefone === null ||\n  telefone === ''\n) {\n  erros.push('telefone é obrigatório');\n} else if (typeof telefone !== 'string') {\n  erros.push('telefone deve ser um texto');\n} else {\n  const telefoneNormalizado = telefone.trim();\n\n  if (\n    !/^\\([1-9]{2}\\) (?:[2-8][0-9]{3}|9[0-9]{4})-[0-9]{4}$/.test(\n      telefoneNormalizado,\n    )\n  ) {\n    erros.push(\n      'telefone inválido; use o formato (DD) 99999-9999 ou (DD) 9999-9999',\n    );\n  }\n}\n\nreturn {\n  nome: typeof nome === 'string' ? nome.trim() : nome,\n  email: typeof email === 'string' ? email.trim() : email,\n  telefone:\n    typeof telefone === 'string' ? telefone.trim() : telefone,\n\n  erros,\n  valido: erros.length === 0,\n\n  trace_id: $execution.id,\n  started_at: Date.now(),\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2960,
+        928
+      ],
+      "id": "c8b61bbf-3dea-4fac-aebc-2318e3695bb3",
+      "name": "validação campos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2736,
+        928
+      ],
+      "id": "c0e523ee-696e-4df8-b807-e90207da1a8f",
+      "name": "campos validados?"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome": "={{ $('campos validados?').first().json.nome }}",
+            "email": "={{ $('campos validados?').first().json.email }}",
+            "telefone": "={{ $('campos validados?').first().json.telefone }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -2064,
+        544
+      ],
+      "id": "ae6f154e-13ef-416c-bece-5da102516ed5",
+      "name": "persiste cliente",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "email",
+              "value": "={{ $json.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -2512,
+        688
+      ],
+      "id": "2091e889-4ec4-4b03-9c56-15309f9441a5",
+      "name": "checa email existente",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ae53d761-b567-41fb-ac68-d2eb7337992f",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2288,
+        624
+      ],
+      "id": "8ccd4110-a1d0-4ced-a237-96953a601072",
+      "name": "email disponível?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1616,
+        784
+      ],
+      "id": "c377451c-6dec-4cd5-a71a-5b2b11c99c82",
+      "name": "retorna resposta"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação campos').item.json.trace_id }}",
+            "workflow": "Cadastrar cliente",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=POST",
+            "rota": "=/desafio/v2/clientes",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação campos').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -1616,
+        976
+      ],
+      "id": "e81f0cbd-86c4-49bf-a6f0-f621a13cea9d",
+      "name": "registra log",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"cliente.cadastrado\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        544
+      ],
+      "id": "c7a4efbc-7e2e-4686-9c38-d06708182b4a",
+      "name": "prepara sucesso"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"cliente.cadastro_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        784
+      ],
+      "id": "14f1676c-1689-4a7d-b4e9-3215774928d9",
+      "name": "prepara erro de banco"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"cliente.cadastro_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"email existente\"\n  },\n  \"response\": {\n    \"erro\": \"Dados inválidos\",\n    \"detalhes\": [\"Este email já está cadastrado.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        1024
+      ],
+      "id": "5cd5150f-767c-4f2a-9597-d01d0ce51c30",
+      "name": "prepara erro de email"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"cliente.cadastro_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"Dados inválidos\",\n    \"detalhes\": {{ $json.erros }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        1264
+      ],
+      "id": "39c9b97c-495c-4c42-9199-a43b133a0a60",
+      "name": "prepara erro de validação"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2288,
+        1584
+      ],
+      "id": "1fd48c22-8906-4b6c-81ef-0182bf8edd7c",
+      "name": "cliente encontrado?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2960,
+        1824
+      ],
+      "id": "b6e121ff-a3c5-45d1-8e91-f51a6604932f",
+      "name": "validação UUID"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2736,
+        1824
+      ],
+      "id": "4c5ca955-1160-48b5-8885-a279b685558f",
+      "name": "UUID válido?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from clientes where id = $1",
+        "options": {
+          "queryReplacement": "={{  $json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -2512,
+        1680
+      ],
+      "id": "26bc0d96-ed36-407f-bc60-07b6e6e07814",
+      "name": "busca cliente",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "path": "desafio/v2/clientes/:id",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3184,
+        1824
+      ],
+      "id": "93db85c3-77df-40f1-90e5-708d8a62d5ce",
+      "name": "consultar cliente",
+      "webhookId": "9c3159f4-0551-4fc3-8b36-ff9495a70a82"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"cliente.consulta_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"UUID inválido\"\n  },\n  \"response\": {\n    \"erro\": \"Dados inválidos\",\n    \"detalhes\": {{ $json.erros }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2064,
+        2160
+      ],
+      "id": "9998ef88-79b6-4914-9357-c2a3888aaa0d",
+      "name": "prepara erro de validação1"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação UUID').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=GET",
+            "rota": "=/desafio/v2/clientes/{{ $('validação UUID').item.json.id }}",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação UUID').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Consultar cliente"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -1840,
+        1920
+      ],
+      "id": "93c810bd-a1c5-4082-b347-a7ebe4c6f308",
+      "name": "registra log2",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1840,
+        1728
+      ],
+      "id": "8b8c4152-9573-43e9-b346-315900e8fbb5",
+      "name": "retorna resposta2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"cliente.consultado\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2064,
+        1488
+      ],
+      "id": "0e2b02fb-4f6d-4c6e-9054-1b5c6c3e5bb8",
+      "name": "prepara sucesso2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"cliente.consulta_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"falha interna no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2064,
+        1920
+      ],
+      "id": "89703729-0bd6-444b-a3e4-4931918b46d1",
+      "name": "prepara erro de banco3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"cliente.consulta_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Erro ao obter cliente\",\n    \"detalhes\": [\"Não encontramos nenhum cliente com o ID informado.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2064,
+        1728
+      ],
+      "id": "b6e2a981-2a11-446e-82f4-0003625dcab1",
+      "name": "prepara erro não encontrado"
+    },
+    {
+      "parameters": {
+        "httpMethod": "DELETE",
+        "path": "desafio/v2/clientes/:id",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3184,
+        2768
+      ],
+      "id": "3bde1d7c-29a5-4cf0-ae7c-33b89545781c",
+      "name": "remover cliente",
+      "webhookId": "9c3159f4-0551-4fc3-8b36-ff9495a70a82"
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2960,
+        2768
+      ],
+      "id": "776291ba-67ab-4394-8a34-ebf02070b143",
+      "name": "validação UUID 1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2736,
+        2768
+      ],
+      "id": "5402a984-ceb2-4dac-9e02-81c71cf917bb",
+      "name": "UUID válido? 1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -2064,
+        2384
+      ],
+      "id": "4eccc483-82ba-4764-a35a-29066915fd86",
+      "name": "remove cliente",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2288,
+        2464
+      ],
+      "id": "353fb328-0504-4cd3-b785-24a34746e609",
+      "name": "cliente encontrado? 1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from clientes where id = $1",
+        "options": {
+          "queryReplacement": "={{  $json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -2512,
+        2528
+      ],
+      "id": "5b1edd92-4d83-451f-a0cf-7b55f07c011b",
+      "name": "busca cliente 1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"cliente.remocao_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        2624
+      ],
+      "id": "f2edd688-3f92-424d-a6e5-7c30e2993424",
+      "name": "prepara erro de banco4"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação UUID 1').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=DELETE",
+            "rota": "=/desafio/v2/clientes/{{ $('validação UUID 1').item.json.id }}",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação UUID 1').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Remover cliente"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -1616,
+        2816
+      ],
+      "id": "6af043e6-0fd2-4007-841b-d54b17a6304b",
+      "name": "registra log3",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"cliente.remocao_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Erro ao obter cliente\",\n    \"detalhes\": [\"Não encontramos nenhum cliente com o ID informado.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        2864
+      ],
+      "id": "66a9b5f5-258c-4d4a-98b6-f54578a4d526",
+      "name": "prepara erro não encontrado1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response ?? '' }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1616,
+        2624
+      ],
+      "id": "049e50da-134b-48db-8cc8-71ca9aab8904",
+      "name": "retorna resposta3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"cliente.remocao_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"UUID inválido\"\n  },\n  \"response\": {\n    \"erro\": \"ID inválido\",\n    \"detalhes\": [\"O formato do ID está inválido\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        3104
+      ],
+      "id": "fedb00f0-e673-41e8-902c-28ea7b1e98a1",
+      "name": "prepara erro de validação2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 204,\n  \"evento\": \"cliente.removido\",\n  \"nivel\": \"success\",\n  \"response\": \"\",\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        2384
+      ],
+      "id": "5bd0eabc-1cd6-4915-b612-09c8946853a6",
+      "name": "prepara sucesso3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "busca clientes": {
+      "main": [
+        [
+          {
+            "node": "agrega itens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "salva trace_id": {
+      "main": [
+        [
+          {
+            "node": "busca clientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco2": {
+      "main": [
+        [
+          {
+            "node": "registra log1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso1": {
+      "main": [
+        [
+          {
+            "node": "registra log1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listar clientes": {
+      "main": [
+        [
+          {
+            "node": "salva trace_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agrega itens": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cadastrar cliente": {
+      "main": [
+        [
+          {
+            "node": "validação campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação campos": {
+      "main": [
+        [
+          {
+            "node": "campos validados?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "campos validados?": {
+      "main": [
+        [
+          {
+            "node": "checa email existente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "persiste cliente": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "checa email existente": {
+      "main": [
+        [
+          {
+            "node": "email disponível?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email disponível?": {
+      "main": [
+        [
+          {
+            "node": "persiste cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco": {
+      "main": [
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de email": {
+      "main": [
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação": {
+      "main": [
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cliente encontrado?": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação UUID": {
+      "main": [
+        [
+          {
+            "node": "UUID válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UUID válido?": {
+      "main": [
+        [
+          {
+            "node": "busca cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca cliente": {
+      "main": [
+        [
+          {
+            "node": "cliente encontrado?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar cliente": {
+      "main": [
+        [
+          {
+            "node": "validação UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso2": {
+      "main": [
+        [
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco3": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação1": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro não encontrado": {
+      "main": [
+        [
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remover cliente": {
+      "main": [
+        [
+          {
+            "node": "validação UUID 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação UUID 1": {
+      "main": [
+        [
+          {
+            "node": "UUID válido? 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UUID válido? 1": {
+      "main": [
+        [
+          {
+            "node": "busca cliente 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remove cliente": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cliente encontrado? 1": {
+      "main": [
+        [
+          {
+            "node": "remove cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca cliente 1": {
+      "main": [
+        [
+          {
+            "node": "cliente encontrado? 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco4": {
+      "main": [
+        [
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro não encontrado1": {
+      "main": [
+        [
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação2": {
+      "main": [
+        [
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso3": {
+      "main": [
+        [
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f5f2383b-f120-47b9-92ec-ae597f37303f",
+  "meta": {
+    "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"
+  },
+  "nodeGroups": [],
+  "id": "pmTHyxw4uPRA3FGS",
+  "tags": []
+}

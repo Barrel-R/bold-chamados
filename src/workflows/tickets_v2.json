@@ -1,0 +1,4086 @@
+{
+  "name": "tickets v2",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/91288c8c-f1ce-4848-b336-02fc2b34ac80",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=protocolo",
+              "value": "={{ $('persiste ticket').first().json.protocolo }}"
+            },
+            {
+              "name": "evento",
+              "value": "ticket.criado"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('persiste ticket').first().json.status }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -4736,
+        304
+      ],
+      "id": "0b153257-45cd-456e-877f-2a176c72e936",
+      "name": "HTTP externo2",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -4512,
+        1024
+      ],
+      "id": "a22d2c36-5b5f-42df-a9ba-e3cca4c4103a",
+      "name": "retorna resposta"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação campos').item.json.trace_id }}",
+            "workflow": "Criar ticket",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=POST",
+            "rota": "=/desafio/v2/tickets",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação campos').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4512,
+        832
+      ],
+      "id": "0a7aed21-e629-4863-8ff5-03969bb0d5d3",
+      "name": "registra log",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"ticket.cadastro_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Cliente não encontrado\",\n    \"detalhes\": [\"Não há cliente com o ID informado\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        976
+      ],
+      "id": "96e81af3-fd6b-4199-86cd-9415dae45cfe",
+      "name": "prepara erro não encontrado"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 201,\n  \"evento\": \"ticket.criado\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        496
+      ],
+      "id": "f947aead-7b1b-4b80-9e91-fbde54537e25",
+      "name": "prepara sucesso"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"ticket.cadastro_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"Dados inválidos\",\n    \"detalhes\": {{ $json.erros }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        1360
+      ],
+      "id": "96070f17-79c1-427c-bc68-ca3e3427aa60",
+      "name": "prepara erro de validação"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"ticket.cadastro_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        736
+      ],
+      "id": "820e69e1-834d-4e3b-b900-14369a07d0af",
+      "name": "prepara erro de banco"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO tickets (\n    protocolo,\n    cliente_id,\n    titulo,\n    descricao,\n    prioridade\n)\nVALUES (\n    'TK-' || extract(year from now()) || '-' ||\n    lpad(nextval('tickets_protocolo_seq')::text, 6, '0'),\n    $1,\n    $2,\n    $3,\n    $4\n)\nRETURNING *;",
+        "options": {
+          "queryReplacement": "={{ $('campos validados?').item.json.cliente_id }},{{ $('campos validados?').item.json.titulo }},{{ $('campos validados?').item.json.descricao }},{{ $('campos validados?').item.json.prioridade }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4960,
+        480
+      ],
+      "id": "0c3729e7-97d8-4b67-a25e-c1c472b05bf4",
+      "name": "persiste ticket",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5184,
+        576
+      ],
+      "id": "77975838-908a-44bb-8ad1-d5295f17f85a",
+      "name": "cliente encontrado?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select id from clientes where id = $1",
+        "options": {
+          "queryReplacement": "={{  $json.cliente_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -5408,
+        928
+      ],
+      "id": "5ce7b254-5575-43b2-b7cd-86f05b417a07",
+      "name": "busca cliente",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5632,
+        1248
+      ],
+      "id": "8b9cfb82-b7e1-4a44-bec8-d10e055fd00b",
+      "name": "campos validados?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? {};\n\nconst {\n  cliente_id,\n  titulo,\n  descricao,\n  prioridade,\n} = body;\n\nconst erros = [];\n\nconst PRIORIDADES_PERMITIDAS = [\n  'baixa',\n  'media',\n  'alta',\n];\n\nconst isUuid = (value) =>\n  typeof value === 'string' &&\n  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(\n    value,\n  );\n\nif (\n  cliente_id === undefined ||\n  cliente_id === null ||\n  cliente_id === ''\n) {\n  erros.push('cliente_id é obrigatório');\n} else if (typeof cliente_id !== 'string') {\n  erros.push('cliente_id deve ser um texto');\n} else if (!isUuid(cliente_id.trim())) {\n  erros.push('cliente_id deve ser um UUID válido');\n}\n\nif (\n  titulo === undefined ||\n  titulo === null ||\n  titulo === ''\n) {\n  erros.push('título é obrigatório');\n} else if (typeof titulo !== 'string') {\n  erros.push('título deve ser um texto');\n} else if (titulo.trim().length < 2) {\n  erros.push('título deve ter pelo menos 2 caracteres');\n}\n\nif (\n  descricao === undefined ||\n  descricao === null ||\n  descricao === ''\n) {\n  erros.push('descrição é obrigatória');\n} else if (typeof descricao !== 'string') {\n  erros.push('descrição deve ser um texto');\n} else if (descricao.trim().length < 8) {\n  erros.push('descrição deve ter pelo menos 8 caracteres');\n}\n\nif (\n  prioridade !== undefined &&\n  prioridade !== null &&\n  prioridade !== ''\n) {\n  if (typeof prioridade !== 'string') {\n    erros.push('prioridade deve ser um texto');\n  } else if (\n    !PRIORIDADES_PERMITIDAS.includes(prioridade.trim())\n  ) {\n    erros.push(\n      'prioridade inválida; use baixa, media ou alta',\n    );\n  }\n}\n\nreturn {\n  cliente_id:\n    typeof cliente_id === 'string'\n      ? cliente_id.trim()\n      : cliente_id,\n\n  titulo:\n    typeof titulo === 'string'\n      ? titulo.trim()\n      : titulo,\n\n  descricao:\n    typeof descricao === 'string'\n      ? descricao.trim()\n      : descricao,\n\n  prioridade:\n    typeof prioridade === 'string' && prioridade.trim()\n      ? prioridade.trim()\n      : 'media',\n\n  erros,\n  valido: erros.length === 0,\n\n  trace_id: $execution.id,\n  started_at: Date.now(),\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5856,
+        1248
+      ],
+      "id": "d3a521e9-b2d9-4f36-b3b6-5d0bbc78213a",
+      "name": "validação campos"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "desafio/v2/tickets",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6080,
+        1248
+      ],
+      "id": "001ecfea-283f-4b22-8f6a-129f26aadd21",
+      "name": "criar ticket",
+      "webhookId": "5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d"
+    },
+    {
+      "parameters": {
+        "path": "desafio/v2/tickets",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6080,
+        1824
+      ],
+      "id": "d7454893-839a-4fc2-a32a-c3b9a25f6b54",
+      "name": "listar tickets",
+      "webhookId": "e692f789-58f9-44c4-8020-903d93121bf9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "926a8b88-e29a-41b9-9b65-df1e88e0a86b",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5632,
+        1824
+      ],
+      "id": "a353fd6f-aa14-48ea-92cb-47565a6dae99",
+      "name": "query válida?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.sql }}",
+        "options": {
+          "queryReplacement": "={{  $json.params }}",
+          "replaceEmptyStrings": false
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -5408,
+        1680
+      ],
+      "id": "c4e0223f-7767-4c38-9d70-ca5725ccd2a3",
+      "name": "busca tickets",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $json.query ?? {};\n\nconst STATUS_VALIDOS = [\n  'aberto',\n  'em_atendimento',\n  'aguardando_cliente',\n  'resolvido',\n  'cancelado'\n];\n\nconst PRIORIDADES_VALIDAS = [\n  'baixa',\n  'media',\n  'alta'\n];\n\nconst status = query.status?.trim() || null;\nconst prioridade = query.prioridade?.trim() || null;\n\nconst erros = [];\n\nif (status && !STATUS_VALIDOS.includes(status)) {\n  erros.push('status inválido');\n}\n\nif (prioridade && !PRIORIDADES_VALIDAS.includes(prioridade)) {\n  erros.push('prioridade inválida');\n}\n\nif (erros.length > 0) {\n  return {\n      valido: false,\n      erros,\n      trace_id: $execution.id,\n      started_at: Date.now(),\n    }\n}\n\nlet sql = `\n  select\n    t.*,\n    c.nome as cliente_nome\n  from tickets t\n  join clientes c on c.id = t.cliente_id\n  where 1=1\n`;\n\nconst params = [];\n\nif (status) {\n  params.push(status);\n  sql += ` and t.status = $${params.length}`;\n}\n\nif (prioridade) {\n  params.push(prioridade);\n  sql += ` and t.prioridade = $${params.length}`;\n}\n\nsql += ' order by t.criado_em desc';\n\nreturn {\n  valido: true,\n  sql,\n  params,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5856,
+        1824
+      ],
+      "id": "5ce1d493-a1f0-4bac-a28b-6d280ef16c0a",
+      "name": "valida query strings e constrói sql query"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"ticket.listagem_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4960,
+        1824
+      ],
+      "id": "9577d0da-5d05-47d2-ac08-36a1c08791a5",
+      "name": "prepara erro de banco1"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('valida query strings e constrói sql query').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=GET",
+            "rota": "=/desafio/v2/tickets",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('valida query strings e constrói sql query').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Listar tickets"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4736,
+        1920
+      ],
+      "id": "71da79d0-d83e-44eb-82ed-adb25e5842d3",
+      "name": "registra log1",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -4736,
+        1728
+      ],
+      "id": "d4005a1f-488d-414a-af07-52a9c2ddab2a",
+      "name": "retorna resposta1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"ticket.listado\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json.response }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4960,
+        1584
+      ],
+      "id": "50cda346-5eef-4c3c-a22b-736e4a0d4a7d",
+      "name": "prepara sucesso1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"ticket.listagem_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"Dados inválidos\",\n    \"detalhes\": {{ $json.erros }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4960,
+        2064
+      ],
+      "id": "f2a2ed02-3e43-4887-ba72-ab2b0c4068d7",
+      "name": "prepara erro de validação1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all()\n\nreturn {\n  response: items.map(item => item.json),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5184,
+        1584
+      ],
+      "id": "6845b433-444e-463a-a8ea-6592a79d0ba4",
+      "name": "agrega itens"
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5856,
+        2624
+      ],
+      "id": "788b6bb8-aa83-4af6-b013-4f1ddcaa4e6a",
+      "name": "validação UUID"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5632,
+        2624
+      ],
+      "id": "ed913e75-71a4-41e2-b9d9-fafd3150fca6",
+      "name": "UUID válido?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5184,
+        2384
+      ],
+      "id": "24080822-eece-4a2b-8da3-1687acad1326",
+      "name": "ticket encontrado?"
+    },
+    {
+      "parameters": {
+        "path": "desafio/v2/tickets/:id",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6080,
+        2624
+      ],
+      "id": "c8f21b4e-ed13-4d87-988f-89c9ca4bc242",
+      "name": "consultar ticket",
+      "webhookId": "2b6ac375-8c26-4887-958d-95e0fbcb38c3"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select\n  t.*,\n  coalesce(\n    json_agg(\n      json_build_object(\n        'id', i.id,\n        'tipo', i.tipo,\n        'mensagem', i.mensagem,\n        'criado_em', i.criado_em\n      ) order by i.criado_em asc\n    ) filter (where i.id is not null),\n    '[]'\n  ) as interacoes\nfrom tickets t\nleft join interacoes i on i.ticket_id = t.id\nwhere t.id = $1\ngroup by t.id",
+        "options": {
+          "queryReplacement": "={{  $json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -5408,
+        2480
+      ],
+      "id": "56629ee2-4eb3-4c08-9a4c-5f4dbee47c0c",
+      "name": "busca ticket + interações",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"ticket.consulta_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"ID inválidos\",\n    \"detalhes\": [\"O formato do ID está inválido.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4960,
+        2960
+      ],
+      "id": "2096c69b-bcce-466f-b2e4-6af164fe54a7",
+      "name": "prepara erro de validação2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"ticket.consulta_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4960,
+        2720
+      ],
+      "id": "f1cd909e-8f1e-47bd-bf14-7ce07d37b221",
+      "name": "prepara erro de banco2"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação UUID').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=GET",
+            "rota": "=/desafio/v2/tickets/{{ $('validação UUID').item.json.id }}",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação UUID').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Consultar ticket"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4736,
+        2720
+      ],
+      "id": "0b0f2988-c1ca-4cab-ad9a-00401ab61e92",
+      "name": "registra log2",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -4736,
+        2528
+      ],
+      "id": "2687d2d6-58fe-4d6d-baea-ff749d8b20fb",
+      "name": "retorna resposta2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"ticket.consultado\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4960,
+        2288
+      ],
+      "id": "e1cc436a-5d9b-48e7-9145-31eb02825d8c",
+      "name": "prepara sucesso2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"ticket.consulta_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Ticket não encontrado\",\n    \"detalhes\": [\"Não há ticket com o ID informado\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4960,
+        2528
+      ],
+      "id": "42812f2e-29fd-4e3d-85c5-56c07a1adae5",
+      "name": "prepara erro não encontrado1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5184,
+        3472
+      ],
+      "id": "b5cba6af-5a3d-4d0f-b138-c202ccea2999",
+      "name": "ticket encontrado?3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "PATCH",
+        "path": "desafio/v2/tickets/:id",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6080,
+        3520
+      ],
+      "id": "47f460e5-7ff3-425b-a7a8-8a0a2fc73d52",
+      "name": "alterar status",
+      "webhookId": "2b6ac375-8c26-4887-958d-95e0fbcb38c3"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tickets",
+          "mode": "list",
+          "cachedResultName": "tickets"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -5408,
+        3376
+      ],
+      "id": "612900e5-a3e4-4dda-9627-531df88974df",
+      "name": "busca ticket1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const params = $json.params ?? {};\nconst body = $json.body ?? {};\n\nconst { id } = params;\nconst { status } = body;\n\nconst erros = [];\n\nconst STATUS_VALIDOS = [\n  'aberto',\n  'em_atendimento',\n  'aguardando_cliente',\n  'resolvido',\n  'cancelado',\n];\n\nconst isUuid = (value) =>\n  typeof value === 'string' &&\n  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(\n    value,\n  );\n\nif (id === undefined || id === null || id === '') {\n  erros.push('ID é obrigatório');\n} else if (typeof id !== 'string') {\n  erros.push('ID deve ser um texto');\n} else if (!isUuid(id.trim())) {\n  erros.push('ID deve ser um UUID válido');\n}\n\nif (\n  status === undefined ||\n  status === null ||\n  status === ''\n) {\n  erros.push('status é obrigatório');\n} else if (typeof status !== 'string') {\n  erros.push('status deve ser um texto');\n} else if (!STATUS_VALIDOS.includes(status.trim())) {\n  erros.push(\n    'status inválido; use aberto, em_atendimento, aguardando_cliente, resolvido ou cancelado',\n  );\n}\n\nreturn {\n  id:\n    typeof id === 'string'\n      ? id.trim()\n      : id,\n  status:\n    typeof status === 'string'\n      ? status.trim()\n      : status,\n  erros,\n  valido: erros.length === 0,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5856,
+        3520
+      ],
+      "id": "2c3cd06e-b236-47af-908c-5d8051e3f1f8",
+      "name": "validação id + status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5632,
+        3520
+      ],
+      "id": "9bf2a223-8dd1-4595-a244-dfb3fbcfd118",
+      "name": "válido?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tickets",
+          "mode": "list",
+          "cachedResultName": "tickets"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "status": "={{ $('validação id + status').first().json.status }}",
+            "atualizado_em": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "protocolo",
+              "displayName": "protocolo",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cliente_id",
+              "displayName": "cliente_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "descricao",
+              "displayName": "descricao",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "prioridade",
+              "displayName": "prioridade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "atualizado_em",
+              "displayName": "atualizado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4960,
+        3376
+      ],
+      "id": "e2d2175c-6ff4-4aec-8104-8c44ffd6143f",
+      "name": "atualiza status e atualizado_em",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "interacoes",
+          "mode": "list",
+          "cachedResultName": "interacoes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.id }}",
+            "tipo": "atualizacao_status",
+            "mensagem": "=Status alterado para {{ $json.status }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo",
+              "displayName": "tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensagem",
+              "displayName": "mensagem",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4288,
+        3456
+      ],
+      "id": "c02f2438-1b67-4671-9ac2-ae06d89755ec",
+      "name": "cria interação de atualização de status",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/91288c8c-f1ce-4848-b336-02fc2b34ac80",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=protocolo",
+              "value": "={{ $('atualiza status e atualizado_em').first().json.protocolo }}"
+            },
+            {
+              "name": "evento",
+              "value": "ticket.atualizado"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('atualiza status e atualizado_em').first().json.status }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -4064,
+        3456
+      ],
+      "id": "21f843b0-20cf-4c86-a238-5654dc3b4017",
+      "name": "HTTP externo1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"ticket.atualizacao_status_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        3184
+      ],
+      "id": "5e31eae6-90a2-4a8e-b63a-dd996f45ab84",
+      "name": "prepara erro de banco3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"ticket.status_atualizado\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        3424
+      ],
+      "id": "f70a625f-90dc-45c1-85c0-71636c9eed02",
+      "name": "prepara sucesso3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"ticket.atualizacao_status_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Ticket não encontrado\",\n    \"detalhes\": [\"Não há ticket com o ID informado\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        3648
+      ],
+      "id": "b7f293aa-ea75-4bc0-be51-c6622fca194b",
+      "name": "prepara erro não encontrado2"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação id + status').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=PATCH",
+            "rota": "=/desafio/v2/tickets/{{ $('validação id + status').item.json.id }}",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação id + status').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Atualizar status do ticket"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4512,
+        3648
+      ],
+      "id": "9d4c35ed-506e-48bd-9bba-a02e1343e194",
+      "name": "registra log3",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -4512,
+        3456
+      ],
+      "id": "149614dd-6582-4c69-86cf-262cef2d7021",
+      "name": "retorna resposta3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"ticket.atualizacao_status_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"Dados inválidos\",\n    \"detalhes\": {{ $json.erros }},\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        3888
+      ],
+      "id": "d8acff75-6d8f-4808-9066-fee7aff62639",
+      "name": "prepara erro de validação3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $json.params.id;\n\nconst isUuid =\n    typeof id === 'string' &&\n    /^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/.test(id);\n\nreturn { \n  id, \n  valido: isUuid,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5856,
+        4496
+      ],
+      "id": "4b429d00-155c-4155-b780-464fee0bb645",
+      "name": "validação UUID 1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5632,
+        4496
+      ],
+      "id": "c2d4d7ca-2d2e-435b-85a4-8817b7d1f20a",
+      "name": "UUID válido? 1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "DELETE",
+        "path": "desafio/v2/tickets/:id",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6080,
+        4496
+      ],
+      "id": "f5d17eba-9f05-4ccd-8c99-83b8d4eef1e7",
+      "name": "remover ticket",
+      "webhookId": "4b0fcd85-2897-4b5a-add4-57b95dad8603"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from tickets where id = $1",
+        "options": {
+          "queryReplacement": "={{  $json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -5408,
+        4256
+      ],
+      "id": "e218425d-242f-4528-a797-dcc7bd4642fc",
+      "name": "busca ticket 1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5184,
+        4176
+      ],
+      "id": "458e2e4b-dd01-420b-8a0e-a86345d8f063",
+      "name": "ticket encontrado?2"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tickets",
+          "mode": "list",
+          "cachedResultName": "tickets"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4960,
+        4112
+      ],
+      "id": "dc05e8f2-7033-4c5e-9c0f-b0f20f6f4985",
+      "name": "remove ticket",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"ticket.remocao_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"ID inválido\",\n    \"detalhes\": [\"O formato do ID está inválido\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        4832
+      ],
+      "id": "ccb580b9-4e41-4807-9c84-b88a9587f849",
+      "name": "prepara erro de validação4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"ticket.remocao_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Ticket não encontrado\",\n    \"detalhes\": [\"Não há ticket com o ID informado\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        4592
+      ],
+      "id": "5a153861-cf9c-44de-bc74-1ae9eff6cbbf",
+      "name": "prepara erro não encontrado3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 204,\n  \"evento\": \"ticket.removido\",\n  \"nivel\": \"success\",\n  \"response\": \"\",\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        4112
+      ],
+      "id": "ecfe6c11-1836-4dc6-b752-44aace232552",
+      "name": "prepara sucesso4"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação UUID 1').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=DELETE",
+            "rota": "=/desafio/v2/tickets/{{ $('validação UUID 1').item.json.id }}",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação UUID 1').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Remover ticket"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4512,
+        4544
+      ],
+      "id": "3578b762-000e-4118-ae84-2739aca0c89d",
+      "name": "registra log4",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -4512,
+        4352
+      ],
+      "id": "33c6dd0d-9dae-46cd-ac43-fbcc1bc1a798",
+      "name": "retorna resposta4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"ticket.remocao_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        4352
+      ],
+      "id": "bfd18619-7dd2-4e53-854b-a66ad47b6ea0",
+      "name": "prepara erro de banco4"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "desafio/v2/tickets/:id/interacoes",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6080,
+        5440
+      ],
+      "id": "ef5deddf-3be8-44a2-b11a-b0a3691a4700",
+      "name": "registrar interação",
+      "webhookId": "5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5632,
+        5440
+      ],
+      "id": "c5603568-79d0-4418-96d0-b908bff09855",
+      "name": "mensagem validada?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select id from tickets where id = $1",
+        "options": {
+          "queryReplacement": "={{  $('validação mensagem + id').first().json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -5408,
+        5200
+      ],
+      "id": "6c5a926c-7b73-4904-aafd-be5d27d7e6b7",
+      "name": "busca ticket",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5184,
+        5120
+      ],
+      "id": "da0ddc62-6d20-4292-b159-1410e8719ac7",
+      "name": "ticket encontrado?1"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "interacoes",
+          "mode": "list",
+          "cachedResultName": "interacoes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.id }}",
+            "tipo": "comentario",
+            "mensagem": "={{ $('validação mensagem + id').first().json.mensagem }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo",
+              "displayName": "tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensagem",
+              "displayName": "mensagem",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4960,
+        5056
+      ],
+      "id": "1338cea4-3a4c-4b44-9b19-a1aeebe7a6a2",
+      "name": "persiste interação",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? {};\nconst params = $json.params ?? {};\n\nconst { mensagem } = body;\nconst { id } = params;\n\nconst erros = [];\n\nconst isUuid = (value) =>\n  typeof value === 'string' &&\n  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(\n    value,\n  );\n\nif (id === undefined || id === null || id === '') {\n  erros.push('ID do ticket é obrigatório');\n} else if (typeof id !== 'string') {\n  erros.push('ID do ticket deve ser um texto');\n} else if (!isUuid(id.trim())) {\n  erros.push('ID do ticket deve ser um UUID válido');\n}\n\nif (\n  mensagem === undefined ||\n  mensagem === null ||\n  mensagem === ''\n) {\n  erros.push('mensagem é obrigatória');\n} else if (typeof mensagem !== 'string') {\n  erros.push('mensagem deve ser um texto');\n} else if (mensagem.trim().length < 5) {\n  erros.push('mensagem deve ter pelo menos 5 caracteres');\n}\n\nreturn {\n  id:\n    typeof id === 'string'\n      ? id.trim()\n      : id,\n\n  mensagem:\n    typeof mensagem === 'string'\n      ? mensagem.trim()\n      : mensagem,\n\n  erros,\n  valido: erros.length === 0,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5856,
+        5440
+      ],
+      "id": "f55f4b4d-616f-4c2c-bea3-3c61b0ed7e07",
+      "name": "validação mensagem + id"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"ticket.criacao_interacao_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Ticket não encontrado\",\n    \"detalhes\": [\"Não há ticket com o ID informado\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        5536
+      ],
+      "id": "6fc59a12-cdd7-47ba-815b-242c1209ba3a",
+      "name": "prepara erro não encontrado4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"ticket.criacao_interacao_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"Dados inválidos\",\n    \"detalhes\": {{ $json.erros }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        5776
+      ],
+      "id": "014b778e-6bd2-4ff5-8e20-457de8d55ded",
+      "name": "prepara erro de validação5"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação mensagem + id').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=POST",
+            "rota": "=/desafio/v2/tickets/{{ $('validação mensagem + id').item.json.id }}/interacoes",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação mensagem + id').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Registrar interação"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4512,
+        5488
+      ],
+      "id": "0b8b48c1-a16c-4211-aeee-dfdf6d1fa5a2",
+      "name": "registra log5",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -4512,
+        5296
+      ],
+      "id": "3d2066ec-f1ed-4e6c-bfc0-a6f8ef1cd5ea",
+      "name": "retorna resposta5"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"ticket.criacao_interacao_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        5296
+      ],
+      "id": "9a9b9395-63f4-4155-a167-0f9dffe7e2ea",
+      "name": "prepara erro de banco5"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"ticket.interacao_criada\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4736,
+        5056
+      ],
+      "id": "84671280-e42c-41a7-a60c-2b6e744e1edf",
+      "name": "prepara sucesso5"
+    },
+    {
+      "parameters": {
+        "path": "desafio/v2/tickets/:id/interacoes",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173,https://bold-chamados.vercel.app"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6080,
+        6384
+      ],
+      "id": "6fcd81ed-b220-4f2d-aeba-3c2a43fffa31",
+      "name": "obter interações de um ticket",
+      "webhookId": "5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "interacoes",
+          "mode": "list",
+          "cachedResultName": "interacoes"
+        },
+        "limit": 100,
+        "where": {
+          "values": [
+            {
+              "column": "ticket_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4960,
+        6544
+      ],
+      "id": "ba34fe92-d84d-4501-a53f-710dc856e091",
+      "name": "busca interações",
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 500,\n  \"evento\": \"ticket.consulta_interacoes_falhou\",\n  \"nivel\": \"error\",\n  \"metadata\": {\n    \"motivo\": \"erro interno no banco\"\n  },\n  \"response\": {\n    \"erro\": \"Ocorreu um erro inesperado\",\n    \"detalhes\": [\"Não foi possível concluir a operação, tente novamente.\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4512,
+        6720
+      ],
+      "id": "8ac634bc-0c4d-4df1-911c-90bbf673e453",
+      "name": "prepara erro de banco6"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "logs",
+          "mode": "list",
+          "cachedResultName": "logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('validação UUID1').item.json.trace_id }}",
+            "evento": "={{ $json.evento }}",
+            "nivel": "={{ $json.nivel }}",
+            "metodo": "=GET",
+            "rota": "=/desafio/v2/tickets/{{ $('validação UUID1').item.json.id }}/interacoes",
+            "status_code": "={{ $json.http_status }}",
+            "duracao_ms": "={{ Date.now() - $('validação UUID1').item.json.started_at }}",
+            "metadata": "={{ $json.metadata ?? {} }}",
+            "workflow": "Consulta interações"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "evento",
+              "displayName": "evento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nivel",
+              "displayName": "nivel",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metodo",
+              "displayName": "metodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rota",
+              "displayName": "rota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duracao_ms",
+              "displayName": "duracao_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -4288,
+        6240
+      ],
+      "id": "8bd5dac9-d731-42b5-b998-10ac65321dda",
+      "name": "registra log6",
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -4288,
+        6432
+      ],
+      "id": "d8841fa0-5278-4d55-bdca-49401448b7b7",
+      "name": "retorna resposta6"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 200,\n  \"evento\": \"ticket.consulta_interacoes\",\n  \"nivel\": \"success\",\n  \"response\": {{ $json.response }},\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4512,
+        6480
+      ],
+      "id": "ccc33599-4795-4819-b1d4-9669cb0c3b51",
+      "name": "prepara sucesso6"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 400,\n  \"evento\": \"ticket.consulta_interacoes_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"validação falhou\"\n  },\n  \"response\": {\n    \"erro\": \"ID inválido\",\n    \"detalhes\": [\"O formato do ID está inválido\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4512,
+        6000
+      ],
+      "id": "d1c1ab1c-ee10-4a44-83c8-34788299f352",
+      "name": "prepara erro de validação6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b124d4a0-5316-4172-b1bf-2e111106373a",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5184,
+        6448
+      ],
+      "id": "3ebeb979-1608-4211-a8cc-07a56dc2c0b0",
+      "name": "ticket encontrado?4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"http_status\": 404,\n  \"evento\": \"ticket.criacao_interacao_falhou\",\n  \"nivel\": \"warn\",\n  \"metadata\": {\n    \"motivo\": \"não encontrado\"\n  },\n  \"response\": {\n    \"erro\": \"Ticket não encontrado\",\n    \"detalhes\": [\"Não há ticket com o ID informado\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4512,
+        6240
+      ],
+      "id": "b50dc031-3d61-49ae-bf59-527fcb847d1d",
+      "name": "prepara erro não encontrado5"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select id from tickets where id = $1",
+        "options": {
+          "queryReplacement": "={{  $('validação UUID1').first().json.id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -5408,
+        6528
+      ],
+      "id": "d8916a03-604b-4ef9-bd57-3a185aeba943",
+      "name": "busca ticket2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "qma1LsRWH0YqLv1Z",
+          "name": "Postgres account 6"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all()\n\nreturn {\n  response: items.map(item => item.json),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4736,
+        6480
+      ],
+      "id": "9f6f1c38-34e8-4554-aad8-7ec3828df251",
+      "name": "agrega itens1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? {};\nconst params = $json.params ?? {};\n\nconst { id } = params;\n\nconst erros = [];\n\nconst isUuid = (value) =>\n  typeof value === 'string' &&\n  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(\n    value,\n  );\n\nif (id === undefined || id === null || id === '') {\n  erros.push('ID do ticket é obrigatório');\n} else if (typeof id !== 'string') {\n  erros.push('ID do ticket deve ser um texto');\n} else if (!isUuid(id.trim())) {\n  erros.push('ID do ticket deve ser um UUID válido');\n}\n\nreturn {\n  id:\n    typeof id === 'string'\n      ? id.trim()\n      : id,\n  erros,\n  valido: erros.length === 0,\n  trace_id: $execution.id,\n  started_at: Date.now(),\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5856,
+        6384
+      ],
+      "id": "226c5faa-2620-4545-95c5-f9c9fad015ff",
+      "name": "validação UUID1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c8c4c4-fe62-471f-9e24-1103e9f752f4",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5632,
+        6384
+      ],
+      "id": "cd540ae3-01ca-4b41-b311-ee1562547060",
+      "name": "UUID válido?1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "prepara erro não encontrado": {
+      "main": [
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso": {
+      "main": [
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação": {
+      "main": [
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco": {
+      "main": [
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "persiste ticket": {
+      "main": [
+        [
+          {
+            "node": "HTTP externo2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "prepara sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cliente encontrado?": {
+      "main": [
+        [
+          {
+            "node": "persiste ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca cliente": {
+      "main": [
+        [
+          {
+            "node": "cliente encontrado?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "registra log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "prepara erro de banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "campos validados?": {
+      "main": [
+        [
+          {
+            "node": "busca cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação campos": {
+      "main": [
+        [
+          {
+            "node": "campos validados?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criar ticket": {
+      "main": [
+        [
+          {
+            "node": "validação campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listar tickets": {
+      "main": [
+        [
+          {
+            "node": "valida query strings e constrói sql query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "query válida?": {
+      "main": [
+        [
+          {
+            "node": "busca tickets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca tickets": {
+      "main": [
+        [
+          {
+            "node": "agrega itens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida query strings e constrói sql query": {
+      "main": [
+        [
+          {
+            "node": "query válida?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso1": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco1": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação1": {
+      "main": [
+        [
+          {
+            "node": "registra log1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agrega itens": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação UUID": {
+      "main": [
+        [
+          {
+            "node": "UUID válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UUID válido?": {
+      "main": [
+        [
+          {
+            "node": "busca ticket + interações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket encontrado?": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar ticket": {
+      "main": [
+        [
+          {
+            "node": "validação UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca ticket + interações": {
+      "main": [
+        [
+          {
+            "node": "ticket encontrado?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso2": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco2": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação2": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro não encontrado1": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket encontrado?3": {
+      "main": [
+        [
+          {
+            "node": "atualiza status e atualizado_em",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "alterar status": {
+      "main": [
+        [
+          {
+            "node": "validação id + status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca ticket1": {
+      "main": [
+        [
+          {
+            "node": "ticket encontrado?3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação id + status": {
+      "main": [
+        [
+          {
+            "node": "válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "válido?": {
+      "main": [
+        [
+          {
+            "node": "busca ticket1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualiza status e atualizado_em": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cria interação de atualização de status": {
+      "main": [
+        [
+          {
+            "node": "HTTP externo1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "prepara erro de banco3": {
+      "main": [
+        [
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro não encontrado2": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso3": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retorna resposta3": {
+      "main": [
+        [
+          {
+            "node": "cria interação de atualização de status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação3": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação UUID 1": {
+      "main": [
+        [
+          {
+            "node": "UUID válido? 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UUID válido? 1": {
+      "main": [
+        [
+          {
+            "node": "busca ticket 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remover ticket": {
+      "main": [
+        [
+          {
+            "node": "validação UUID 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca ticket 1": {
+      "main": [
+        [
+          {
+            "node": "ticket encontrado?2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket encontrado?2": {
+      "main": [
+        [
+          {
+            "node": "remove ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remove ticket": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso4": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco4": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro não encontrado3": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação4": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "registrar interação": {
+      "main": [
+        [
+          {
+            "node": "validação mensagem + id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mensagem validada?": {
+      "main": [
+        [
+          {
+            "node": "busca ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca ticket": {
+      "main": [
+        [
+          {
+            "node": "ticket encontrado?1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket encontrado?1": {
+      "main": [
+        [
+          {
+            "node": "persiste interação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "persiste interação": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação mensagem + id": {
+      "main": [
+        [
+          {
+            "node": "mensagem validada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso5": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco5": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro não encontrado4": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação5": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obter interações de um ticket": {
+      "main": [
+        [
+          {
+            "node": "validação UUID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca interações": {
+      "main": [
+        [
+          {
+            "node": "agrega itens1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de banco6": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara sucesso6": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro de validação6": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket encontrado?4": {
+      "main": [
+        [
+          {
+            "node": "busca interações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro não encontrado5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara erro não encontrado5": {
+      "main": [
+        [
+          {
+            "node": "retorna resposta6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "registra log6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca ticket2": {
+      "main": [
+        [
+          {
+            "node": "ticket encontrado?4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de banco6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agrega itens1": {
+      "main": [
+        [
+          {
+            "node": "prepara sucesso6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validação UUID1": {
+      "main": [
+        [
+          {
+            "node": "UUID válido?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UUID válido?1": {
+      "main": [
+        [
+          {
+            "node": "busca ticket2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prepara erro de validação6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7e917071-851e-407f-9b8f-7231ea2c910b",
+  "meta": {
+    "instanceId": "7cce0f22afd979eb5cdabdf675922ece8fbc867ff522ebcb757171840eb6783a"
+  },
+  "nodeGroups": [],
+  "id": "dXUKvmSPfxVNzyz0",
+  "tags": []
+}
