@@ -7,11 +7,16 @@ import TicketDetailPanel from '@/components/tickets/TicketDetailPanel.vue'
 import TicketTable from '@/components/tickets/TicketTable.vue'
 
 import { useTicketsStore } from '@/stores/tickets'
+import { onBeforeRouteLeave } from 'vue-router'
 
 const ticketsStore = useTicketsStore()
 
 onMounted(() => {
     ticketsStore.fetchTickets()
+})
+
+onBeforeRouteLeave(() => {
+    ticketsStore.clearSelectedTicket()
 })
 </script>
 
