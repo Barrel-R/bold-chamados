@@ -190,7 +190,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
     }
 
-    async function addInteracao(tipo: string, mensagem: string) {
+    async function addInteracao(mensagem: string) {
         const ticket = selectedTicket.value
 
         if (!ticket) {
@@ -200,7 +200,6 @@ export const useTicketsStore = defineStore('tickets', () => {
         const interacao = await createInteracao(
             ticket.id,
             {
-                tipo,
                 mensagem,
             },
         )

@@ -16,7 +16,6 @@ const errorDetails = ref<string[]>([])
 const deletingTicket = ref(false)
 const deleteError = ref<string | null>(null)
 const novaMensagem = ref('')
-const tipoInteracao = ref('comentario')
 
 const creatingInteracao = ref(false)
 const interacaoCreateError = ref<string | null>(null)
@@ -102,7 +101,7 @@ async function handleDeleteTicket() {
         if (err instanceof ApiError) {
             deleteError.value = err.message
         } else {
-            error.value = 'Não foi possível remover o ticket'
+            deleteError.value = 'Não foi possível remover o ticket'
         }
     } finally {
         deletingTicket.value = false
@@ -123,16 +122,17 @@ async function handleCreateInteracao() {
 
     try {
         await ticketsStore.addInteracao(
-            tipoInteracao.value,
             mensagem,
         )
 
         novaMensagem.value = ''
     } catch (err) {
-        interacaoCreateError.value =
-            err instanceof Error
-                ? err.message
-                : 'Não foi possível adicionar a interação'
+        if (err instanceof ApiError) {
+            const message = err.details ? err.details[0] ?? err.message : err.message
+            interacaoCreateError.value = message
+        } else {
+            interacaoCreateError.value = 'Não foi possível atualizar o ticket'
+        }
     } finally {
         creatingInteracao.value = false
     }
@@ -317,17 +317,6 @@ function formatDate(date?: string | null) {
                             <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-400">
                                 Nova interação
                             </label>
-
-                            <select v-model="tipoInteracao"
-                                class="mb-3 w-full rounded-xl border border-border bg-white px-3 py-2 text-sm outline-none transition focus:border-primary">
-                                <option value="comentario">
-                                    Comentário
-                                </option>
-
-                                <option value="resposta">
-                                    Resposta
-                                </option>
-                            </select>
 
                             <textarea v-model="novaMensagem" rows="3" maxlength="1000"
                                 placeholder="Escreva uma mensagem..."

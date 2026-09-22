@@ -189,7 +189,6 @@ export async function deleteTicket(id: string): Promise<void> {
 // Interações
 
 export async function createInteracao(id: string, data: {
-    tipo: string
     mensagem: string
 }): Promise<Interacao> {
     return request<Interacao>(`${TICKET_INTERACAO_API_URL}/tickets/${id}/interacoes`, {
