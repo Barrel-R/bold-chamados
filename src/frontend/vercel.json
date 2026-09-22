@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/clientes",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/clientes/novo",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/tickets/novo",
+      "destination": "/index.html"
+    }
+  ]
+}
