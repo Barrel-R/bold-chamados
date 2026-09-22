@@ -60,7 +60,7 @@ As rotas são implementadas através de Webhooks do n8n.
 | GET    | `/tickets/:id`            | Buscar ticket               |
 | GET    | `/tickets/:id/interacoes` | Listar interações do ticket |
 | POST   | `/tickets`                | Criar ticket                |
-| POST   | `tickets/:id/interacoes`  | Registrar interação         |
+| POST   | `/tickets/:id/interacoes` | Registrar interação         |
 | PATCH  | `/tickets/:id`            | Atualizar status            |
 | DELETE | `/tickets/:id`            | Remover ticket              |
 
@@ -96,36 +96,84 @@ O evento enviado contém um payload na seguinte estrutura:
 
 ## Frontend
 
-Principais telas:
+O frontend foi organizado para manter o fluxo principal simples e com pouca troca de contexto.
+
+### Fluxo entre telas
+
+```text
+Caixa de entrada (/)
+   │
+   ├──► Novo Ticket (/tickets/novo)
+   │       │
+   │       └──► após criar, retorna para a Caixa de entrada
+   │
+   ├──► Selecionar ticket
+   │       │
+   │       └──► abre painel lateral de detalhes
+   │               ├── alterar status
+   │               ├── registrar interação
+   │               └── excluir ticket
+   │
+   └──► Clientes (/clientes)
+           │
+           ├──► Novo Cliente (/clientes/novo)
+           │       │
+           │       └──► após criar, retorna para Clientes
+           │
+           └──► remover cliente
+````
+
+O fluxo principal parte da Caixa de entrada, onde o usuário acompanha e filtra os tickets.
+A seleção de um ticket abre seus detalhes em um painel lateral, evitando uma navegação adicional para operações rápidas.
+
+O cadastro de clientes é separado da gestão de tickets. A tela de criação de ticket carrega os clientes existentes e informa quando é necessário cadastrar um cliente antes de abrir um chamado.
+
 ### Caixa de entrada
-- Rota: `/`
-- cards de status, filtros, tabela de tickets.
+
+* Rota: `/`
+* Cards de status, filtros e tabela de tickets.
+* A seleção de uma linha abre o painel lateral de detalhes.
 
 ![Caixa de Entrada](src/docs/screenshots/caixa_de_entrada.png)
 
-- **Detalhe do ticket**: dados, histórico de interações, nova interação, mudança de status e botão de excluir.
+#### Detalhe do ticket
+
+O painel lateral permite:
+
+* visualizar os dados do ticket;
+* consultar o histórico de interações;
+* registrar uma nova interação;
+* alterar o status;
+* excluir o ticket.
 
 ![Detalhes do Ticket](src/docs/screenshots/ticket_detalhes.png)
 
 ![Interações do Ticket](src/docs/screenshots/ticket_interacoes.png)
 
-## Novo Ticket
-- Rota: `/tickets/novo`
-- Formulário com validação nativa, carregamento de clientes e aviso caso não tenham clientes cadastrados.
+### Novo Ticket
+
+* Rota: `/tickets/novo`
+* Formulário com validação, carregamento de clientes e aviso caso não existam clientes cadastrados.
+* Após a criação, o usuário retorna para a Caixa de entrada.
 
 ![Novo Ticket](src/docs/screenshots/ticket_novo.png)
 
 ### Clientes
-- Rota: `/clientes`
-- tabela de clientes, botão de navegação para cadastrar, remover clientes
+
+* Rota: `/clientes`
+* Lista os clientes cadastrados.
+* Permite remover clientes e navegar para o cadastro de um novo cliente.
 
 ![Clientes](src/docs/screenshots/clientes.png)
 
 ### Novo Cliente
-- Rota: `/clientes/novo`
-- Formulário com validação nativa e máscara de telefone 
+
+* Rota: `/clientes/novo`
+* Formulário com validação e máscara de telefone.
+* Após o cadastro, o usuário retorna para a listagem de clientes.
 
 ![Novo Cliente](src/docs/screenshots/cliente_novo.png)
+
 
 ### CORS e Vercel Function
 
