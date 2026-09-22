@@ -26,11 +26,9 @@ export const useTicketsStore = defineStore('tickets', () => {
     const filters = ref<{
         status: Status | null
         prioridade: Prioridade | null
-        clienteId: string | null
     }>({
         status: null,
         prioridade: null,
-        clienteId: null,
     })
 
     const interacoes = ref<Interacao[]>([])
@@ -115,7 +113,6 @@ export const useTicketsStore = defineStore('tickets', () => {
         filters.value = {
             status: null,
             prioridade: null,
-            clienteId: null,
         }
 
         search.value = ''
@@ -213,7 +210,6 @@ export const useTicketsStore = defineStore('tickets', () => {
         () => [
             filters.value.status,
             filters.value.prioridade,
-            filters.value.clienteId,
         ],
         () => {
             fetchTickets()

@@ -25,17 +25,6 @@ onMounted(loadClientes)
 
 <template>
     <section class="flex min-h-16 flex-wrap items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
-        <select v-model="ticketsStore.filters.clienteId"
-            class="h-10 rounded-full border border-border bg-background px-4 text-sm outline-none transition focus:border-primary">
-            <option :value="null">
-                Cliente: Todos
-            </option>
-
-            <option v-for="cliente in clientes" :key="cliente.id" :value="cliente.id">
-                {{ cliente.nome }}
-            </option>
-        </select>
-
         <select v-model="ticketsStore.filters.status"
             class="h-10 rounded-full border border-border bg-background px-4 text-sm outline-none transition focus:border-primary">
             <option :value="null">
