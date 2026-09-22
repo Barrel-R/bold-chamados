@@ -32,7 +32,7 @@ const apiVersion = useApiVersionStore()
 
                         <button type="button" class="relative h-6 w-11 rounded-full transition" :class="apiVersion.isV2
                             ? 'bg-primary'
-                            : 'bg-surface'
+                            : 'bg-gray-500'
                             " title="Alternar versão da API" @click="apiVersion.toggleVersion()">
                             <span class="absolute top-1 h-4 w-4 rounded-full bg-white transition-all" :class="apiVersion.isV2
                                 ? 'left-6'
