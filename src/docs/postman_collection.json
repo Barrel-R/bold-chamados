@@ -1,0 +1,715 @@
+{
+  "info": {
+    "_postman_id": "33c2523e-994d-4d56-826e-bcdbe1f07201",
+    "name": "Bold chamados",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21970906"
+  },
+  "item": [
+    {
+      "name": "clientes",
+      "item": [
+        {
+          "name": "listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio/{{api_version}}clientes",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio",
+                "{{api_version}}clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "consultar cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/9c3159f4-0551-4fc3-8b36-ff9495a70a82/desafio/{{api_version}}clientes/:id",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "9c3159f4-0551-4fc3-8b36-ff9495a70a82",
+                "desafio",
+                "{{api_version}}clientes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "e9fa20cd-c955-40c2-9a49-2676f3fd12f1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "cadastrar cliente",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nome",
+                  "value": "john teste 5",
+                  "type": "text",
+                  "uuid": "c87a4496-9615-4548-84ec-39ad9de85525"
+                },
+                {
+                  "key": "telefone",
+                  "value": "(75) 98188-5956",
+                  "type": "text",
+                  "uuid": "d0efd84b-3799-4ea7-a885-dbc16f1a2b2a"
+                },
+                {
+                  "key": "email",
+                  "value": "test5@email.com",
+                  "type": "text",
+                  "uuid": "b8dcfc2b-b3f9-4957-a6b9-c2f6054d431a"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio/{{api_version}}clientes",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio",
+                "{{api_version}}clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "cadastrar cliente erro",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nome",
+                  "value": "123",
+                  "type": "text",
+                  "uuid": "49edb1fe-19d1-444a-8971-9b74bc5fc05a"
+                },
+                {
+                  "key": "telefone",
+                  "value": "(75) 98188-5956",
+                  "type": "text",
+                  "uuid": "ab9c8b44-8e63-4a76-b9e9-e3dbbd7c90a9"
+                },
+                {
+                  "key": "email",
+                  "value": "test@email.com",
+                  "type": "text",
+                  "uuid": "3ff42552-ba6b-4f28-b411-bf6779296142"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio/{{api_version}}clientes",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio",
+                "{{api_version}}clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "remover cliente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/9c3159f4-0551-4fc3-8b36-ff9495a70a82/desafio/{{api_version}}clientes/:id",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "9c3159f4-0551-4fc3-8b36-ff9495a70a82",
+                "desafio",
+                "{{api_version}}clientes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "a838f0ef-1912-4075-8164-64da252e9a1c"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "tickets",
+      "item": [
+        {
+          "name": "listar tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio/{{api_version}}tickets?prioridade=alta&status=em_atendimento",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio",
+                "{{api_version}}tickets"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "aberto",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "prioridade",
+                  "value": "alta"
+                },
+                {
+                  "key": "status",
+                  "value": "em_atendimento"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar tickets erro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio/{{api_version}}tickets?status=errado",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio",
+                "{{api_version}}tickets"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "aberto",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "prioridade",
+                  "value": "medio",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "errado"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "consultar ticket",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/2b6ac375-8c26-4887-958d-95e0fbcb38c3/desafio/{{api_version}}tickets/:id",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "2b6ac375-8c26-4887-958d-95e0fbcb38c3",
+                "desafio",
+                "{{api_version}}tickets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "f3823642-7954-4146-b0d3-4ff266432bba"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar interações do ticket",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d/desafio/{{api_version}}tickets/:id/interacoes",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d",
+                "desafio",
+                "{{api_version}}tickets",
+                ":id",
+                "interacoes"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "f3823642-7954-4146-b0d3-4ff266432bba"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar ticket",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cliente_id",
+                  "value": "b219330a-f021-41af-86f4-958640b1c1fb",
+                  "type": "text",
+                  "uuid": "e0831a87-b30f-4184-b7e9-725dfd87b1a1"
+                },
+                {
+                  "key": "titulo",
+                  "value": "ticket trace logs",
+                  "type": "text",
+                  "uuid": "9967e406-9c88-45d7-b10b-2bc3f0013e29"
+                },
+                {
+                  "key": "descricao",
+                  "value": "descricao trace logs",
+                  "type": "text",
+                  "uuid": "f5c8be72-e52e-4cc6-b24d-d8fd6865234c"
+                },
+                {
+                  "key": "prioridade",
+                  "value": "baixa",
+                  "type": "text",
+                  "uuid": "279573bb-e2fc-4a6f-bd57-f943fa77efda"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio{{api_version}}/tickets",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio{{api_version}}",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar ticket erro",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cliente_id",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "e0831a87-b30f-4184-b7e9-725dfd87b1a1"
+                },
+                {
+                  "key": "titulo",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "9967e406-9c88-45d7-b10b-2bc3f0013e29"
+                },
+                {
+                  "key": "descricao",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "f5c8be72-e52e-4cc6-b24d-d8fd6865234c"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio/{{api_version}}tickets",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio",
+                "{{api_version}}tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar ticket cliente 404",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cliente_id",
+                  "value": "e9fa20cd-c955-40c2-9a49-2676f3fd12f2",
+                  "type": "text",
+                  "uuid": "e0831a87-b30f-4184-b7e9-725dfd87b1a1"
+                },
+                {
+                  "key": "titulo",
+                  "value": "ticket teste",
+                  "type": "text",
+                  "uuid": "9967e406-9c88-45d7-b10b-2bc3f0013e29"
+                },
+                {
+                  "key": "descricao",
+                  "value": "descrição do ticket",
+                  "type": "text",
+                  "uuid": "f5c8be72-e52e-4cc6-b24d-d8fd6865234c"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/desafio/tickets",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "desafio",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar interação",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "mensagem",
+                  "value": "teste mensagem nova",
+                  "type": "text",
+                  "uuid": "b9d28692-e9ca-419d-a4d4-3d5ce503cc71"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d/desafio/{{api_version}}tickets/:id/interacoes",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d",
+                "desafio",
+                "{{api_version}}tickets",
+                ":id",
+                "interacoes"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "f13df407-41ef-4d95-a766-3375e51ffa0b"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar interação erro",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "mensagem",
+                  "value": "teste mensagem nova",
+                  "type": "text",
+                  "uuid": "b9d28692-e9ca-419d-a4d4-3d5ce503cc71"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d/desafio/{{api_version}}tickets/:id/interacoes",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "5b25f1cf-37bc-471f-ab1d-d87bc78b8d6d",
+                "desafio",
+                "{{api_version}}tickets",
+                ":id",
+                "interacoes"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "f13df407-41ef-4d95-a766-3375e51ffa0b"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "alterar status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "status",
+                  "value": "aberto",
+                  "type": "text",
+                  "uuid": "06e6818b-1dae-4c9b-84ce-d3d764bbcec6"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/2b6ac375-8c26-4887-958d-95e0fbcb38c3/desafio/{{api_version}}tickets/:id",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "2b6ac375-8c26-4887-958d-95e0fbcb38c3",
+                "desafio",
+                "{{api_version}}tickets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "b5e7a955-af30-4054-baaf-6efae650a0dc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "alterar status erro",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "status",
+                  "value": "inexistente",
+                  "type": "text",
+                  "uuid": "06e6818b-1dae-4c9b-84ce-d3d764bbcec6"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/2b6ac375-8c26-4887-958d-95e0fbcb38c3/desafio/{{api_version}}tickets/:id",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "2b6ac375-8c26-4887-958d-95e0fbcb38c3",
+                "desafio",
+                "{{api_version}}tickets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "f3823642-7954-4146-b0d3-4ff266432bba"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "remover ticket",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://dev.boldsolution.com.br/webhook-test/4b0fcd85-2897-4b5a-add4-57b95dad8603/desafio/{{api_version}}tickets/:id",
+              "protocol": "https",
+              "host": [
+                "dev",
+                "boldsolution",
+                "com",
+                "br"
+              ],
+              "path": [
+                "webhook-test",
+                "4b0fcd85-2897-4b5a-add4-57b95dad8603",
+                "desafio",
+                "{{api_version}}tickets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "8f735804-734b-48d1-8545-8728f001de79"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "api_version",
+      "value": ""
+    }
+  ]
+}
